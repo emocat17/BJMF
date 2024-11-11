@@ -73,9 +73,9 @@ def Task():
             'id': match,
             'lat': X,
             'lng': Y,
-            # 'acc': ACC,  # 海拔
-            # 'res': '',  # 拍照签到
-            # 'gps_addr': ''  # GPS地址为空
+            'acc': ACC,  # 海拔
+            'res': '',  # 拍照签到
+            'gps_addr': ''  # GPS地址为空
         }
 
         response = requests.post(url1, headers=headers, data=payload)
