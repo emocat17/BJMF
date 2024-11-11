@@ -51,7 +51,7 @@ pip install requests beautifulsoup4
 - `lng` - 经度
 - `acc` - 海拔高度
 - `cookie` - 从浏览器中获取的 `cookie` 信息，用于模拟登录状态
-- `QmsgKEY` - Qmsg 服务的消息推送密钥，用于发送成功通知
+- `QmsgKEY` - Qmsg 服务的消息推送密钥，用于发送成功通知(选填)
 
 ### 参数获取方法
 - `class` - 使用抓包工具(比如`HttpCanary`,教程[点击这里](https://blog.csdn.net/weixin_53891182/article/details/124739048) ); 抓取一次签到过程,在过滤(Url关键词或者其他)界面中查找`g8n`
@@ -65,10 +65,11 @@ pip install requests beautifulsoup4
 - `QmsgKEY` - Qmsg 服务的消息推送密钥，用于发送成功通知
   - Qmsg 官网注册账号即可获取 `https://qmsg.zendee.cn/`, 教程在官网自行查询
 
-### 抓包软件内容
+### 抓包软件使用方法
 - 签到前打开抓包工具
 - 进入软件进行签到
 - 返回到抓包工具, 过滤(Url关键词或者其他)界面中查找`g8n`找到Post请求, 复制其中的`cookie`和`classID`
+- 更详细方法请自行搜索
 
 ![抓包界面](doc/img1.jpg)
 
@@ -90,3 +91,7 @@ python BJMF.py
   - linux 系统: 使用 `crontab` 设置定时任务 [教程](https://geek-docs.com/python/python-ask-answer/815_python_execute_python_script_via_crontab.html)
   - 或者使用云服务定时任务, 比如腾讯云函数, 阿里云函数计算, 百度云函数计算等 教程自行搜索
 
+### 未来打算
+- 多人签到(×)
+- 一检测到新任务就签到(×)
+- 代码冗余
