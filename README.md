@@ -71,7 +71,7 @@ pip install requests beautifulsoup4
 - 返回到抓包工具, 过滤(Url关键词或者其他)界面中查找`g8n`找到Post请求, 复制其中的`cookie`和`classID`
 - 更详细方法请自行搜索
 - 电脑打开微信也可以在网址栏查看`class ID`,F12可以查看发送请求的`Cookie`(目前只看到了`classID`,`Cookie`可以尝试`F12`->`网络`中进行`POST`包的过滤查找,目前未尝试)
-
+- 更详细的使用和安装方法:[点击链接](https://blog.csdn.net/weixin_53891182/article/details/124739048)
 ![抓包界面](doc/img1.jpg)
 
 ### 使用方法
