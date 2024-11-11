@@ -22,13 +22,7 @@
 4. **bs4** - 用于解析 HTML 页面
 5. `报错没哪个库装哪个就行`
 
-### 安装依赖
 
-使用 `pip` 安装所需的第三方库：
-
-```bash
-pip install requests beautifulsoup4
-```
 
 ## 配置
 
