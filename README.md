@@ -16,12 +16,6 @@
 ```bash
     pip install -r requirements.txt
 ```
-1. **requests** - 用于发送 HTTP 请求
-2. **beautifulsoup4** - 用于解析 HTML 页面
-3. **json** 和 **datetime** 是 Python 标准库的一部分，因此无需单独安装
-4. **bs4** - 用于解析 HTML 页面
-5. `报错没哪个库装哪个就行`
-
 
 
 ## 配置
