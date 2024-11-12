@@ -2,7 +2,7 @@
 
 - Thanks To [JasonYANG170/AutoCheckBJMF](https://github.com/JasonYANG170/AutoCheckBJMF)
 - 仅根据自己学校的班级魔方需求更改简化代码，仅保留GPS自动签到+QQ通知签到情况，其他功能请到项目[AutoCheckBJMF](https://github.com/JasonYANG170/AutoCheckBJMF)项目查看其他内容
-
+- 多人版本移步`Branch`(测试中)
 
 ## 功能
 
