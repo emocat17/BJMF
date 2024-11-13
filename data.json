@@ -1,8 +1,20 @@
 {
-    "class": "xxxxxx",
-    "lat": "xxxxxx",
-    "lng": "xxxxxx",
-    "acc": "xxxxxx",
-    "cookie": "your_cookie",
-    "QmsgKEY": "your_Qmsg_key"
+    "students": [
+        {
+            "class": "xxxxxx",
+            "lat": "xx.xxxxxx",
+            "lng": "xxx.xxxxxx",
+            "acc": "30",
+            "cookie": "your_cookie_here",
+            "QmsgKEY": "your_QmsgKEY_here"
+        },
+        {
+            "class": "xxxxxx",
+            "lat": "xx.xxxxxx",
+            "lng": "xxx.xxxxxx",
+            "acc": "30",
+            "cookie": "your_cookie_here",
+            "QmsgKEY": "your_QmsgKEY_here"
+        }
+    ]
 }
