@@ -27,7 +27,8 @@
     "lng": "xxxxxx",
     "acc": "xxxxxx",
     "cookie": "your_cookie",
-    "QmsgKEY": "your_Qmsg_key"
+    "QmsgKEY": "your_Qmsg_key",
+    "WXKey": "your_WX_key"
 }
 ```
 - 只需要配置json文件即可;
