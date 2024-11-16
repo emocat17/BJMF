@@ -65,7 +65,7 @@
 - 更详细方法请自行搜索
 - 电脑打开微信也可以在网址栏查看`class ID`,F12可以查看发送请求的`Cookie`(目前只看到了`classID`,`Cookie`可以尝试`F12`->`网络`中进行`POST`包的过滤查找,目前未尝试)
 - 更详细的使用和安装方法:[点击链接](https://blog.csdn.net/weixin_53891182/article/details/124739048)
-![抓包界面](doc/img1.jpg)
+<img src="doc/img1.jpg" alt="抓包界面" style="width: 50%; height: auto;">
 
 ### 使用方法
 
