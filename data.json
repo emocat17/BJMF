@@ -2,19 +2,30 @@
     "students": [
         {
             "class": "xxxxxx",
-            "lat": "xx.xxxxxx",
-            "lng": "xxx.xxxxxx",
+            "lat": "xxxxxx",
+            "lng": "xxxxxx",
             "acc": "30",
-            "cookie": "your_cookie_here",
-            "QmsgKEY": "your_QmsgKEY_here"
+            "cookie": "xxxx",
+            "QmsgKEY": "",
+            "WXKey": ""
         },
         {
             "class": "xxxxxx",
-            "lat": "xx.xxxxxx",
-            "lng": "xxx.xxxxxx",
-            "acc": "30",
-            "cookie": "your_cookie_here",
-            "QmsgKEY": "your_QmsgKEY_here"
+            "lat": "xxxxxx",
+            "lng": "xxxxxx",
+            "acc": "31",
+            "cookie": "xxxx",
+            "QmsgKEY": "",
+            "WXKey": ""
+        },
+        {
+            "class": "xxxxxx",
+            "lat": "xxxxxx",
+            "lng": "xxxxxx",
+            "acc": "32",
+            "cookie": "xxxx",
+            "QmsgKEY": "",
+            "WXKey": ""
         }
     ]
 }

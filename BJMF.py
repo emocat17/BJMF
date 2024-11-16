@@ -16,7 +16,7 @@ with open('data.json', 'r') as file:
     students = json_data['students']  # 获取所有学生的数据
 
 # 发送QQ消息通知
-def send_message(QmsgKEY):
+def sendQQmessage(QmsgKEY):
     url = f'https://qmsg.zendee.cn/send/{QmsgKEY}'
     current_time = get_current_time()  # 获取当前时间
     message = {
@@ -24,9 +24,24 @@ def send_message(QmsgKEY):
     }
     response = requests.post(url, data=message)
     if response.status_code == 200:
-        print("消息发送成功")
+        print("QQ消息发送成功")
     else:
-        print(f"消息发送失败，状态码: {response.status_code}")
+        print(f"QQ消息发送失败，状态码: {response.status_code}")
+
+
+def wx_send(key):
+    url = f'https://sctapi.ftqq.com/{key}.send'
+    current_time = get_current_time()  # 获取当前时间
+
+    data = {
+        'text': f"{current_time}  签到成功！",
+        'desp': "123123"
+    }
+    response = requests.post(url, data=data)
+    if response.status_code == 200:
+        print("QQ消息发送成功")
+    else:
+        print(f"QQ消息发送失败，状态码: {response.status_code}")
 
 # 签到任务
 def Task(student):
@@ -42,7 +57,9 @@ def Task(student):
         Cookie_rs = re.search(r'remember_student_59ba36addc2b2f9401580f014c7f58ea4e30989d=[^;]+',
                                      student['cookie']).group(0)  # 提取cookie
         QmsgKEY = student['QmsgKEY']
-
+        WXKey = student['WXKey']
+        # wx_send(WXKey) # Test
+        # sendQQmessage(QmsgKEY) # Test
         url = f'http://g8n.cn/student/course/{ClassID}/punchs'
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; X64; Linux; Android 9;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Firefox/92.0  WeChat/x86_64 Weixin NetType/4G Language/zh_CN ABI/x86_64',
@@ -75,7 +92,7 @@ def Task(student):
             }
 
             response = requests.post(url1, headers=headers, data=payload)
-            x = BeautifulSoup(response.text, 'html.parser')
+            # x = BeautifulSoup(response.text, 'html.parser')
             if response.status_code == 200:
                 print("请求成功")
                 soup_response = BeautifulSoup(response.text, 'html.parser')
@@ -89,11 +106,18 @@ def Task(student):
                         print("未开始签到,请稍后")
                     else:
                         print("本次签到成功")
+                        # 任意选择一种通知方式
                         if QmsgKEY:
-                            send_message(QmsgKEY)
+                            sendQQmessage(QmsgKEY)
                             print("存在QmsgKEY，已发送消息")
                         else:
                             print("QmsgKEY为空，未发送消息")
+
+                        if WXKey:
+                            wx_send(WXKey)
+                            print("存在WXServerKey，已发送消息")
+                        else:
+                            print("WXServerKey为空，未发送消息")
             else:
                 print(f"请求失败，状态码: {response.status_code}")
     except:

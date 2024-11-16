@@ -2,13 +2,12 @@
 
 - Thanks To [JasonYANG170/AutoCheckBJMF](https://github.com/JasonYANG170/AutoCheckBJMF)
 - 仅根据自己学校的班级魔方需求更改简化代码，仅保留GPS自动签到+QQ通知签到情况，其他功能请到项目[AutoCheckBJMF](https://github.com/JasonYANG170/AutoCheckBJMF)项目查看其他内容
-- 多人版本移步`Branch`(测试中)
-
+- 可配置多人签到
 ## 功能
 
 - 自动从指定课程中获取签到项
 - 通过模拟表单提交，实现自动签到
-- 签到成功后，发送消息通知（通过 Qmsg 服务,选配）
+- 签到成功后，发送消息通知（通过 Qmsg 服务,选配,可以不用配置）
 
 ## 安装依赖
 
@@ -31,6 +30,8 @@
     "QmsgKEY": "your_Qmsg_key"
 }
 ```
+- 只需要配置json文件即可;
+- py文件可根据实际需求更改
 
 ### 参数说明:
 
@@ -39,7 +40,8 @@
 - `lng` - 经度
 - `acc` - 海拔高度
 - `cookie` - 从浏览器中获取的 `cookie` 信息，用于模拟登录状态
-- `QmsgKEY` - Qmsg 服务的消息推送密钥，用于发送成功通知(选填)
+- `QmsgKEY` - Qmsg 服务的消息推送密钥，用于QQ发送消息(选填)
+- `WXKey` - Server酱-Turbo版,用于微信通知消息(选填)
 
 ### 参数获取方法
 - `class` - 使用抓包工具(比如`HttpCanary`,教程[点击这里](https://blog.csdn.net/weixin_53891182/article/details/124739048) ); 抓取一次签到过程,在过滤(Url关键词或者其他)界面中查找`g8n`
@@ -50,8 +52,10 @@
   - 随便写个数字即可, 这里不用管
 - `cookie` - 从浏览器中获取的 `cookie` 信息，用于模拟登录状态
   - 同样使用抓包工具获取 
-- `QmsgKEY` - Qmsg 服务的消息推送密钥，用于发送成功通知
+- `QmsgKEY` - Qmsg 服务的消息推送密钥，用于发送QQ成功签到通知
   - Qmsg 官网注册账号即可获取 `https://qmsg.zendee.cn/`, 教程在官网自行查询
+- `WXKey` - Server酱-Turbo版 服务的消息推送密钥，用于发送微信成功签到通知
+  - Server酱-Turbo版 官网微信扫码关注公众号获取 `https://sct.ftqq.com/`, 教程在官网自行查询
 
 ### 抓包软件使用方法
 - 签到前打开抓包工具
@@ -81,8 +85,8 @@ python BJMF.py
   - 或者使用云服务定时任务, 比如腾讯云函数, 阿里云函数计算, 百度云函数计算等 教程自行搜索
 
 ### 未来打算
-- 多人签到(×)
+- 多人签到(√)
 - 一检测到新任务就签到(×)
-- 测试必须字段(×)
-- 打包成 `exe` , 供电脑上没有安装`python`环境的电脑签到(×)
-- 打包成 `app` , 供手机上使用自动任务完成签到(×)
+- 画饼:
+  - 打包成 `exe` , 供电脑上没有安装`python`环境的电脑签到(×)
+  - 打包成 `app` , 供手机上使用自动任务完成签到(×)
