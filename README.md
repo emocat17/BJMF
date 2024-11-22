@@ -63,9 +63,9 @@
 ### 抓包软件使用方法
 - 签到前打开抓包工具
 - 进入VX进行签到
-- 返回到抓包工具, 过滤(Url关键词或者其他)界面中查找`g8n`找到Post请求, 复制其中的`cookie`和`classID`
+- 返回到抓包工具, 过滤(Url关键词或者其他)界面中查找`g8n`找到Post请求, 复制其中的`cookie`和`classID`;这里的`cookie`全部复制就行
 - 更详细方法请自行搜索
-- 电脑打开微信也可以在网址栏查看`class ID`,F12可以查看发送请求的`Cookie`(目前只看到了`classID`,`Cookie`可以尝试`F12`->`网络`中进行`POST`包的过滤查找,目前未尝试)
+- 电脑打开微信也可以在网址栏查看`class ID`,F12可以查看发送请求的`Cookie`(目前只看到了`classID`,`Cookie`可以尝试`F12`->`网络`中进行`POST`包的过滤查找,步骤在后面,往下滑查看) 
 - 更详细的使用和安装方法:[点击链接](https://blog.csdn.net/weixin_53891182/article/details/124739048)
 
 [//]: # (![抓包界面]&#40;doc/img1.jpg&#41;)
@@ -76,7 +76,10 @@
 - 电脑登录微信,点击签到项,使得浏览器打开签到页面
   - [//]: # (![微信签到页面]&#40;doc/img1.jpg&#41;)
   - <img src="doc/img2.jpg" alt="微信签到页面" style="width: 50%; height: auto;">
-- 按F12打开开发者工具,切换到`网络`(`Network`)标签,侧边栏找到一个只有六位数的栏目,点击,再在打开的页面中点击Cookie,如下所示:
+  - [//]: # (![浏览器查看班级码]&#40;doc/img1.jpg&#41;)
+  - <img src="doc/img4.jpg" alt="浏览器查看班级码" style="width: 100%; height: auto;">
+  - 这边的浏览器网址有两个框;左边的六位数就是`班级ID`,右边的就是具体的签到任务,这里不用管右边的,代码中会自动获取
+- 按F12打开开发者工具,切换到`网络`(`Network`)标签,侧边栏找到一个全是数字的标签,再在打开的页面中点击Cookie,如下所示:
   - [//]: # (![浏览器查看Cookie]&#40;doc/img1.jpg&#41;)
   - <img src="doc/img3.jpg" alt="浏览器查看Cookie" style="width: 100%; height: auto;">
 - 在我使用红色框选中的地方复制`Cookie`信息,粘贴到`data.json`文件中即可
