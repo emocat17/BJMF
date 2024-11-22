@@ -1,4 +1,4 @@
-# BJMF 班级魔法自动签到 GPS
+# BJMF 班级魔方自动签到 GPS
 
 - Thanks To [JasonYANG170/AutoCheckBJMF](https://github.com/JasonYANG170/AutoCheckBJMF)
 - 仅根据自己学校的班级魔方需求更改简化代码，其他功能请到项目[AutoCheckBJMF](https://github.com/JasonYANG170/AutoCheckBJMF)项目查看其他内容
