@@ -57,6 +57,7 @@
   - 方法2:使用浏览器开发者工具(F12)查看`cookie`信息, 复制`cookie`信息
 - `QmsgKEY` - Qmsg 服务的消息推送密钥，用于发送QQ成功签到通知
   - Qmsg 官网注册账号即可获取 `https://qmsg.zendee.cn/`, 教程在官网自行查询
+  - 如果你使用的是特殊网络下的主机遇到Qmsg发送不了的错误,比如`10054远程主机关闭了连接`之类的,按照给出的网址修改`DNS`进行改进(至少我改过之后就不报错了)`https://blog.csdn.net/itnerd/article/details/106764904`
 - `WXKey` - Server酱-Turbo版 服务的消息推送密钥，用于发送微信成功签到通知
   - Server酱-Turbo版 官网微信扫码关注公众号获取 `https://sct.ftqq.com/`, 教程在官网自行查询
 
