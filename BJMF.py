@@ -58,8 +58,8 @@ def Task(student):
                                      student['cookie']).group(0)  # 提取cookie
         QmsgKEY = student['QmsgKEY']
         WXKey = student['WXKey']
-        # wx_send(WXKey) # Test
-        # sendQQmessage(QmsgKEY) # Test
+        # sendQQmessage(QmsgKEY) # 测试QQ推送
+        # wx_send(WXKey) # 测试WX推送
         url = f'http://g8n.cn/student/course/{ClassID}/punchs'
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; X64; Linux; Android 9;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Firefox/92.0  WeChat/x86_64 Weixin NetType/4G Language/zh_CN ABI/x86_64',
@@ -98,7 +98,7 @@ def Task(student):
                 soup_response = BeautifulSoup(response.text, 'html.parser')
                 title_div = soup_response.find('div', id='title')
 
-                if title_div:
+                if title_div: # title_div根据签到后界面的主题显示判断是否签到成功
                     title_text = title_div.text.strip()
                     if "已签到" in title_text:
                         print("已签到！无需再次签到")
@@ -106,7 +106,7 @@ def Task(student):
                         print("未开始签到,请稍后")
                     else:
                         print("本次签到成功")
-                        # 任意选择一种通知方式
+                        # 任意选择一种通知方式,若为空则不发送
                         if QmsgKEY:
                             sendQQmessage(QmsgKEY)
                             print("存在QmsgKEY，已发送消息")

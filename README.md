@@ -4,6 +4,7 @@
 - 仅根据自己学校的班级魔方需求更改简化代码,仅支持GPS签到(可在范围外)，其他功能请到项目[AutoCheckBJMF](https://github.com/JasonYANG170/AutoCheckBJMF)项目查看其他内容
 - 可配置多人签到
 - 可配置QQ/WX通知签到情况
+- 如果你觉得好用,`Please Star`orz
 ## 功能
 
 - 自动从指定课程中获取签到项
@@ -47,7 +48,8 @@
 
 ### 参数获取方法
 - `class` - 使用抓包工具(比如`HttpCanary`,教程[点击这里](https://blog.csdn.net/weixin_53891182/article/details/124739048) ); 抓取一次签到过程,在过滤(Url关键词或者其他)界面中查找`g8n`
-  - (具体视实际情况而定,我的是`g8n`,之后应该只有一条POST请求,为`https://g8n.cn/student/punchs/course/xxxxxx/yyyyyy`, 其中的`xxxxxx`就是六位数的课程ID,`yyyyyy`就是具体的签到任务,这里不用管yyyyyy,代码中会自动获取)
+  - 具体视实际情况而定,了解到有的是`k8n`,有的是`g8n`;代码里是`g8n`,若有不同记得修改;
+  - 之后应该只有一条POST请求,为`https://g8n.cn/student/punchs/course/xxxxxx/yyyyyy`, 其中的`xxxxxx`就是六位数的课程ID,`yyyyyy`就是具体的签到任务,这里不用管yyyyyy,代码中会自动获取
 - `lat` 和 `lng` - 使用地图工具获取当前位置的经纬度,
   - 比如[高德地图的坐标拾取器](https://lbs.amap.com/tools/picker), 进去搜索自己的位置即可获取经纬度
 - `acc` - 海拔高度
@@ -56,10 +58,10 @@
   - 方法1:使用抓包工具获取 
   - 方法2:使用浏览器开发者工具(F12)查看`cookie`信息, 复制`cookie`信息
 - `QmsgKEY` - Qmsg 服务的消息推送密钥，用于发送QQ成功签到通知
-  - Qmsg 官网注册账号即可获取 `https://qmsg.zendee.cn/`, 教程在官网自行查询
-  - 如果你使用的是特殊网络下的主机遇到Qmsg发送不了的错误,比如`10054远程主机关闭了连接`之类的,按照给出的网址修改`DNS`进行改进(至少我改过之后就不报错了)`https://blog.csdn.net/itnerd/article/details/106764904`
+  - Qmsg 官网注册账号即可获取 [Qmsg官网](https://qmsg.zendee.cn/), 教程在官网自行查询
+  - 如果你使用的是特殊网络下的主机遇到Qmsg发送不了的错误,比如`10054远程主机关闭了连接`之类的,按照给出的网址修改`DNS`进行改进(至少我改过之后就不报错了)[点击链接](https://blog.csdn.net/itnerd/article/details/106764904)
 - `WXKey` - Server酱-Turbo版 服务的消息推送密钥，用于发送微信成功签到通知
-  - Server酱-Turbo版 官网微信扫码关注公众号获取 `https://sct.ftqq.com/`, 教程在官网自行查询
+  - Server酱-Turbo版 官网微信扫码关注公众号获取 [Server酱官网](https://sct.ftqq.com/), 教程在官网自行查询
 
 ### 抓包软件使用方法
 - 签到前打开抓包工具
