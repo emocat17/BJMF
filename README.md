@@ -23,21 +23,22 @@
 
 该脚本需要读取一个名为 `data.json` 的文件，其中包含必要的配置信息。请参考以下格式配置 `data.json` 文件：
 ```json
-{
-    "class": "xxxxxx",
-    "lat": "xxxxxx",
-    "lng": "xxxxxx",
-    "acc": "xxxxxx",
-    "cookie": "your_cookie",
-    "QmsgKEY": "your_Qmsg_key",
-    "WXKey": "your_WX_key"
-}
+ {
+            "name": "xxx",
+            "class": "xxxxxx",
+            "lat": "xxxxxx",
+            "lng": "xxxxxx",
+            "acc": "xxx",
+            "cookie": "xxxx",
+            "QmsgKEY": "",
+            "WXKey": ""
+        },
 ```
 - 只需要配置json文件即可;
 - py文件可根据实际需求更改
 
 ### 参数说明:
-
+- `name`: - 随便写,只是方便区分
 - `class` - BJMF里的课程 `ID`
 - `lat` - 纬度
 - `lng` - 经度

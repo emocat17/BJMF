@@ -1,10 +1,11 @@
 {
     "students": [
         {
+            "name": "随便写",
             "class": "xxxxxx",
             "lat": "xxxxxx",
             "lng": "xxxxxx",
-            "acc": "30",
+            "acc": "随便写",
             "cookie": "xxxx",
             "QmsgKEY": "",
             "WXKey": ""

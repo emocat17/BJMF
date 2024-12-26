@@ -39,9 +39,9 @@ def wx_send(key):
     }
     response = requests.post(url, data=data)
     if response.status_code == 200:
-        print("QQ消息发送成功")
+        print("WX消息发送成功")
     else:
-        print(f"QQ消息发送失败，状态码: {response.status_code}")
+        print(f"WX消息发送失败，状态码: {response.status_code}")
 
 # 签到任务
 def Task(student):
@@ -49,17 +49,19 @@ def Task(student):
         current_time = get_current_time()  # 获取当前时间
         print(f"当前时间: {current_time}")
         print(f"进入检索...")
-
+        name = student['name']
         ClassID = student['class']
         lat = student['lat']
         lng = student['lng']
         ACC = student['acc']
         Cookie_rs = re.search(r'remember_student_59ba36addc2b2f9401580f014c7f58ea4e30989d=[^;]+',
                                      student['cookie']).group(0)  # 提取cookie
+        print(f"{name},{ClassID},{lat},{lng},{ACC},{Cookie_rs}")
+        # print(f"实际需要的Cookie信息: {Cookie_rs}")
         QmsgKEY = student['QmsgKEY']
         WXKey = student['WXKey']
-        # sendQQmessage(QmsgKEY) # 测试QQ推送
-        # wx_send(WXKey) # 测试WX推送
+        # wx_send(WXKey) # Test1
+        # sendQQmessage(QmsgKEY) # Test2
         url = f'http://g8n.cn/student/course/{ClassID}/punchs'
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; X64; Linux; Android 9;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Firefox/92.0  WeChat/x86_64 Weixin NetType/4G Language/zh_CN ABI/x86_64',
@@ -69,7 +71,7 @@ def Task(student):
         }
 
         response = requests.get(url, headers=headers)
-        print(f"进入界面响应: {response}")
+        print(f"进入_{name}_账号界面响应: {response}")
 
         # 查找扫码签到项
         pattern = re.compile(r'punchcard_(\d+)')
@@ -93,12 +95,13 @@ def Task(student):
 
             response = requests.post(url1, headers=headers, data=payload)
             # x = BeautifulSoup(response.text, 'html.parser')
+
             if response.status_code == 200:
                 print("请求成功")
                 soup_response = BeautifulSoup(response.text, 'html.parser')
                 title_div = soup_response.find('div', id='title')
 
-                if title_div: # title_div根据签到后界面的主题显示判断是否签到成功
+                if title_div:
                     title_text = title_div.text.strip()
                     if "已签到" in title_text:
                         print("已签到！无需再次签到")
@@ -106,7 +109,7 @@ def Task(student):
                         print("未开始签到,请稍后")
                     else:
                         print("本次签到成功")
-                        # 任意选择一种通知方式,若为空则不发送
+                        # 任意选择一种通知方式
                         if QmsgKEY:
                             sendQQmessage(QmsgKEY)
                             print("存在QmsgKEY，已发送消息")
@@ -120,8 +123,8 @@ def Task(student):
                             print("WXServerKey为空，未发送消息")
             else:
                 print(f"请求失败，状态码: {response.status_code}")
-    except:
-        print("发生错误，跳过该配置")
+    except Exception as e:
+        print(f"发生错误{e}，跳过该配置......")
 
 if __name__ == "__main__":
     try:
