@@ -83,14 +83,9 @@
   - [//]: # (![浏览器查看班级码]&#40;doc/img1.jpg&#41;)
   - <img src="doc/img4.jpg" alt="浏览器查看班级码" style="width: 100%; height: auto;">
   - 这边的浏览器网址有两个框;左边的六位数就是`班级ID`,右边的就是具体的签到任务,这里不用管右边的,代码中会自动获取
-- 按F12打开开发者工具,切换到`网络`(`Network`)标签,侧边栏找到一个全是数字的标签,再在打开的页面中点击Cookie,如下所示:
-  - [//]: # (![浏览器查看Cookie]&#40;doc/img1.jpg&#41;)
-  - <img src="doc/img3.jpg" alt="浏览器查看Cookie" style="width: 100%; height: auto;">
-- 在我使用红色框选中的地方复制`Cookie`信息,粘贴到`data.json`文件中即可
-- 注意: 这个方法获取的`Cookie`需要进行拼接,假设左侧框获取的为A(即`remember_student_59ba36addc2b2f9401580f014c7f58ea4e30989d`,这个是固定的),右侧框获取的为B(即`aaaaaa%bbbbbbb%cccccc`),那么最终的`Cookie`信息为`A=B`
-- PS:浏览器可能在此页面右键无法直接复制内容,可以先对内容进行双击,再复制;同时若这部分的cookie中含有`%`符号,则双击选中的部分会被该符号阶段;可将鼠标悬停在其上方进行分段复制再使用%进行连接;
-- 总之,最终获取到的样式应该为: `remember_student_59ba36addc2b2f9401580f014c7f58ea4e30989d=aaaaaaaa%bbbbbbbbbbbbbb%cc`
-
+- 按F12打开开发者工具,切换到`网络`(`Network`)标签,侧边栏找到一个全是数字的标签,再在打开的页面中点击Cookie,
+- 直接复制图中淡蓝色选中部分：
+<img src="doc/img5.jpg" alt="浏览器查看Cookie" style="width: 100%; height: auto;">
 ### 使用方法
 
 - 配置 `data.json` 文件，确保填入正确的课程信息和其他配置项

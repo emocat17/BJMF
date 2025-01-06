@@ -48,7 +48,7 @@ def Task(student):
     try:
         current_time = get_current_time()  # 获取当前时间
         print(f"当前时间: {current_time}")
-        print(f"进入检索...")
+        print("进入检索...")
         name = student['name']
         ClassID = student['class']
         lat = student['lat']
@@ -76,6 +76,7 @@ def Task(student):
         # 查找扫码签到项
         pattern = re.compile(r'punchcard_(\d+)')
         matches = pattern.findall(response.text)
+        # print(response.text)
         if not matches:
             print("未找到在进行的签到/不在签到时间内")
             return
