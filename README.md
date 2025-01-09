@@ -61,6 +61,20 @@
 - `QmsgKEY` - Qmsg 服务的消息推送密钥，用于发送QQ成功签到通知
   - Qmsg 官网注册账号即可获取 [Qmsg官网](https://qmsg.zendee.cn/), 教程在官网自行查询
   - 如果你使用的是特殊网络下的主机遇到Qmsg发送不了的错误,比如`10054远程主机关闭了连接`之类的,按照给出的网址修改`DNS`进行改进(至少我改过之后就不报错了)[点击链接](https://blog.csdn.net/itnerd/article/details/106764904)
+   - 若依旧无法使用Qmsg，显示一些错误，比如`远程主机关闭连接`之类的，那么可能就需要使用代理；
+      - 确保电脑上已经有代理软件`我使用的是clash，默认的代理端口为7890，那么我的代理就是http://127.0.0.1:7890`;在发送消息的代码前加入以下代码：
+        ```python
+          proxy = "http://127.0.0.1:7890"
+          proxies = {
+                "http": proxy,
+                "https": proxy
+          }
+        ```
+      - 然后在发送消息的函数`send_qq_message`的`post`方法中加入`proxies=proxies`即可,如下所示:
+      ```python
+        response = requests.post(url, data=message , proxies=proxies)
+      ```
+
 - `WXKey` - Server酱-Turbo版 服务的消息推送密钥，用于发送微信成功签到通知
   - Server酱-Turbo版 官网微信扫码关注公众号获取 [Server酱官网](https://sct.ftqq.com/), 教程在官网自行查询
 
