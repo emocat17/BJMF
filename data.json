@@ -1,7 +1,7 @@
 {
     "students": [
         {
-            "name": "随便写",
+            "name": "name1",
             "class": "xxxxxx",
             "lat": "xxxxxx",
             "lng": "xxxxxx",
@@ -11,6 +11,7 @@
             "WXKey": ""
         },
         {
+            "name": "name2",
             "class": "xxxxxx",
             "lat": "xxxxxx",
             "lng": "xxxxxx",
@@ -20,6 +21,7 @@
             "WXKey": ""
         },
         {
+            "name": "name3",
             "class": "xxxxxx",
             "lat": "xxxxxx",
             "lng": "xxxxxx",
