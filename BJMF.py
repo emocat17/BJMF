@@ -4,6 +4,12 @@ from bs4 import BeautifulSoup
 import json
 import datetime
 import sys
+import time
+#设置代理；用于Qmsg访问
+proxies = {
+    "http": "http://127.0.0.1:7890",
+    "https": "http://127.0.0.1:7890"
+}
 
 # 获取当前时间
 def get_current_time():
@@ -22,7 +28,7 @@ def sendQQmessage(QmsgKEY):
     message = {
         "msg": f"{current_time}  签到成功！",
     }
-    response = requests.post(url, data=message)
+    response = requests.post(url, data=message, proxies=proxies)
     if response.status_code == 200:
         print("QQ消息发送成功")
     else:
@@ -48,7 +54,7 @@ def Task(student):
     try:
         current_time = get_current_time()  # 获取当前时间
         print(f"当前时间: {current_time}")
-        print("进入检索...")
+        # print(f"进入检索...")
         name = student['name']
         ClassID = student['class']
         lat = student['lat']
@@ -56,7 +62,7 @@ def Task(student):
         ACC = student['acc']
         Cookie_rs = re.search(r'remember_student_59ba36addc2b2f9401580f014c7f58ea4e30989d=[^;]+',
                                      student['cookie']).group(0)  # 提取cookie
-        print(f"{name},{ClassID},{lat},{lng},{ACC},{Cookie_rs}")
+        print(f"当前任务：{name},{ClassID},{lat},{lng},{ACC}")
         # print(f"实际需要的Cookie信息: {Cookie_rs}")
         QmsgKEY = student['QmsgKEY']
         WXKey = student['WXKey']
@@ -76,7 +82,6 @@ def Task(student):
         # 查找扫码签到项
         pattern = re.compile(r'punchcard_(\d+)')
         matches = pattern.findall(response.text)
-        # print(response.text)
         if not matches:
             print("未找到在进行的签到/不在签到时间内")
             return
@@ -137,4 +142,5 @@ if __name__ == "__main__":
         print("程序被手动中断")
     finally:
         print("程序执行完毕，自动退出")
+        time.sleep(10)
         sys.exit(0)
