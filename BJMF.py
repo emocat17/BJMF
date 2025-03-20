@@ -5,11 +5,11 @@ import json
 import datetime
 import sys
 import time
-#设置代理；用于Qmsg访问
-proxies = {
-    "http": "http://127.0.0.1:7890",
-    "https": "http://127.0.0.1:7890"
-}
+#设置代理；用于Qmsg访问,网络连接错误时尝试
+# proxies = {
+#     "http": "http://127.0.0.1:7890",
+#     "https": "http://127.0.0.1:7890"
+# }
 
 # 获取当前时间
 def get_current_time():
@@ -23,12 +23,14 @@ with open('data.json', 'r') as file:
 
 # 发送QQ消息通知
 def sendQQmessage(QmsgKEY):
-    url = f'https://qmsg.zendee.cn/send/{QmsgKEY}'
+    url = f"https://qmsg.zendee.cn/send/{QmsgKEY}"
+    # headers = {'Content-Type': 'application/x-www-form-urlencoded'}
     current_time = get_current_time()  # 获取当前时间
     message = {
         "msg": f"{current_time}  签到成功！",
     }
-    response = requests.post(url, data=message, proxies=proxies)
+    # response = requests.post(url, data=message, proxies=proxies)
+    response = requests.post(url, data=message)
     if response.status_code == 200:
         print("QQ消息发送成功")
     else:
@@ -67,7 +69,7 @@ def Task(student):
         QmsgKEY = student['QmsgKEY']
         WXKey = student['WXKey']
         # wx_send(WXKey) # Test1
-        # sendQQmessage(QmsgKEY) # Test2
+        sendQQmessage(QmsgKEY) # Test2
         url = f'http://g8n.cn/student/course/{ClassID}/punchs'
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; X64; Linux; Android 9;) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Firefox/92.0  WeChat/x86_64 Weixin NetType/4G Language/zh_CN ABI/x86_64',
