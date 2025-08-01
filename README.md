@@ -45,8 +45,9 @@
 - `lng` - 经度
 - `acc` - 海拔高度
 - `cookie` - 从浏览器中获取的 `cookie` 信息，用于模拟登录状态
-- `QmsgKEY` - Qmsg 服务的消息推送密钥,用于QQ发送消息(选填)
-- `WXKey` - Server酱-Turbo版,用于微信通知消息(选填)
+- `推送参数`
+  - `QmsgKEY` - Qmsg 服务的消息推送密钥,用于QQ发送消息(选填)
+  - `WXKey` - Server酱-Turbo版,用于微信通知消息(选填)
 
 ### 参数获取方法
 - `class` - 使用抓包工具(比如`HttpCanary`,教程[点击这里](https://blog.csdn.net/weixin_53891182/article/details/124739048) ); 抓取一次签到过程,在过滤(Url关键词或者其他)界面中查找`g8n`
