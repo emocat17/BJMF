@@ -154,17 +154,29 @@ def get_class_info(headers):
                 alt_name_pattern = r'(\d{4}级[^<>\n\r]{3,15})'
                 names = re.findall(alt_name_pattern, content)
             
+            # 查找班级链接，提取课程ID
+            class_links = re.findall(r'https://bjmf\.k8n\.cn/student/course/(\d+)', content)
+            
+            # 如果没有找到班级链接，尝试其他模式
+            if not class_links:
+                # 查找相对链接模式
+                relative_links = re.findall(r'href=[\'"]/student/course/(\d+)[\'"]', content)
+                if relative_links:
+                    class_links = relative_links
+            
             # 组织班级信息
             classes = []
-            if codes or names:
-                # 如果找到了班级码或班级名称
-                max_len = max(len(codes), len(names), 1)
+            if codes or names or class_links:
+                # 如果找到了班级码、班级名称或班级链接
+                max_len = max(len(codes), len(names), len(class_links), 1)
                 for i in range(max_len):
                     code = codes[i] if i < len(codes) else "未知"
                     name = names[i] if i < len(names) else "未知"
+                    course_id = class_links[i] if i < len(class_links) else "未知"
                     classes.append({
                         "class_code": code,
-                        "class_name": name
+                        "class_name": name,
+                        "course_id": course_id
                     })
             else:
                 # 尝试其他方式查找班级信息
@@ -173,7 +185,8 @@ def get_class_info(headers):
                 for match in general_matches[:3]:  # 取前3个匹配项
                     classes.append({
                         "class_code": "未知",
-                        "class_name": match.strip()
+                        "class_name": match.strip(),
+                        "course_id": "未知"
                     })
             
             if classes:
@@ -181,11 +194,9 @@ def get_class_info(headers):
                 for i, cls in enumerate(classes):
                     print(f"   {i+1}. 班级码: {cls['class_code']}")
                     print(f"      班级名称: {cls['class_name']}")
+                    print(f"      班级代号: {cls['course_id']}")
             else:
                 print("⚠️ 未提取到班级信息")
-                # 显示部分内容供调试
-                print("📄 页面内容预览:")
-                print(content[:500])
             
             return classes
         else:
@@ -225,12 +236,16 @@ def main():
             if user_profile:
                 print(f"👤 用户姓名: {user_profile['name']}")
                 print(f"🆔 用户学号: {user_profile['student_id']}")
+            else:
+                print("⚠️ 未能获取用户信息")
             
             if class_info:
                 print("\n📚 班级信息:")
-                for cls in class_info:
-                    print(f"   班级码: {cls['class_code']}")
-                    print(f"   班级名称: {cls['class_name']}")
+                for i, cls in enumerate(class_info):
+                    print(f"   {i+1}. 班级码: {cls['class_code']}")
+                    print(f"      班级名称: {cls['class_name']}")
+                    if cls.get('course_id') and cls['course_id'] != "未知":
+                        print(f"      班级代号: {cls['course_id']}")
             print("=" * 60)
         else:
             print("\n❌ 登录失败")
