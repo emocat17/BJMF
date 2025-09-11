@@ -7,6 +7,62 @@ from tool.message_sender import sendQQmessage, wx_send
 # 设置请求超时时间
 REQUEST_TIMEOUT = 10
 
+def extract_remember_cookie(cookie_str):
+    """从完整cookie中提取remember_student cookie"""
+    cookie_match = re.search(r'remember_student_59ba36addc2b2f9401580f014c7f58ea4e30989d=[^;]+', cookie_str)
+    if cookie_match:
+        return cookie_match.group(0)
+    return None
+
+def get_user_profile(headers):
+    """获取用户个人信息"""
+    # 访问个人页面
+    profile_url = "https://bjmf.k8n.cn/student/my"
+    
+    try:
+        response = requests.get(profile_url, headers=headers, timeout=10)
+        if response.status_code == 200:
+            # 提取用户姓名和学号
+            content = response.text
+            
+            # 查找姓名 (从JavaScript变量中提取)
+            name_pattern = r'uname[\'"]?\s*:\s*[\'"]([^\'"]+)[\'"]'
+            name_match = re.search(name_pattern, content)
+            if not name_match:
+                # 备用方案：从HTML中查找
+                name_match = re.search(r'>([^<>\n\r]{2,4})\s*同学<', content)
+                if not name_match:
+                    name_match = re.search(r'>(蔡永昊)<', content)  # 特定姓名匹配
+            
+            name = name_match.group(1).strip() if name_match else "未找到"
+            
+            # 查找学号 (优先从HTML中查找正确的学号)
+            # 首先尝试从用户信息区域查找学号 (在姓名下方的div中)
+            id_pattern = r'<div class="font-weight-bold">[^<]+</div>\s*<div>(\d{9})</div>'
+            id_match = re.search(id_pattern, content)
+            
+            # 如果没找到，尝试其他模式查找9位数字的学号
+            if not id_match:
+                id_pattern = r'(\d{9})'
+                id_matches = re.findall(id_pattern, content)
+                # 过滤掉可能的时间戳等非学号的9位数字
+                valid_ids = [id for id in id_matches if not id.startswith(('1757596', '2024'))]
+                if valid_ids:
+                    student_id = valid_ids[0]
+                else:
+                    student_id = "未找到"
+            else:
+                student_id = id_match.group(1).strip() if id_match else "未找到"
+            
+            return {
+                "name": name,
+                "student_id": student_id
+            }
+        else:
+            return None
+    except requests.exceptions.RequestException:
+        return None
+
 # 签到任务
 def Task(student):
     try:
@@ -37,6 +93,20 @@ def Task(student):
         except Exception as e:
             print(f"错误: {name} 的cookie解析失败: {e}")
             return
+            
+        # 构造请求头以获取用户信息
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; X64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+            'Cookie': Cookie_rs,
+        }
+        
+        # 获取并显示用户信息
+        user_profile = get_user_profile(headers)
+        if user_profile:
+            print(f"👤 用户姓名: {user_profile['name']}")
+            print(f"🆔 用户学号: {user_profile['student_id']}")
+        else:
+            print("❌ 无法获取用户信息")
             
         print(f"当前任务：{name},{ClassID},{lat},{lng},{ACC}")
         QmsgKEY = student.get('QmsgKEY', '')

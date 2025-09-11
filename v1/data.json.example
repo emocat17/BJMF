@@ -1,0 +1,25 @@
+{
+    "students": [
+        {
+            "name": "XXXXXXX",
+            "class": "XXXXXX",
+            "lat": "XXXXXXXX",
+            "lng": "XXXXXXXX",
+            "acc": "30",
+            "cookie": "XXXXXXXXXXXXX",
+            "QmsgKEY": "",
+            "WXKey": ""
+        },
+
+        {
+            "name": "XXXXXX",
+            "class": "XXXXXX",
+            "lat": "XXXXXX",
+            "lng": "XXXXXX",
+            "acc": "30",
+            "cookie": "XXXXXXXX",
+            "QmsgKEY": "",
+            "WXKey": ""
+        }
+    ]
+}
