@@ -105,7 +105,7 @@ def Task(student):
             # x = BeautifulSoup(response.text, 'html.parser')
 
             if response.status_code == 200:
-                print("请求成功")
+                print("网络请求成功(等待cookie验证)")
                 soup_response = BeautifulSoup(response.text, 'html.parser')
                 title_div = soup_response.find('div', id='title')
 
