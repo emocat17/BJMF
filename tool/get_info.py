@@ -66,32 +66,21 @@ def login_and_get_user_info(student):
 
 def get_user_profile(headers):
     """获取用户个人信息"""
-    print("\n=== 获取用户个人信息 ===")
-    
     # 创建新的session确保无缓存
     session = requests.Session()
     session.headers.update(headers)
     
     # 访问个人页面
     profile_url = "https://bjmf.k8n.cn/student/my"
-    print(f" 访问个人页面: {profile_url}")
     
     try:
         response = session.get(profile_url, timeout=10)
-        print(f" 个人页面响应状态码: {response.status_code}")
-        
-        # 不再以状态码200作为判断依据，而是以姓名是否返回的字段长度为空来判断cookie是否错误
         # 提取用户姓名和学号
         content = response.text
         
         # 查找姓名 (从JavaScript变量中提取)
         name_pattern = r'uname[\'"]?\s*:\s*[\'"]([^\'"]+)[\'"]'
         name_match = re.search(name_pattern, content)
-        if not name_match:
-            # 备用方案：从HTML中查找
-            name_match = re.search(r'>([^<>\n\r]{2,4})\s*同学<', content)
-            if not name_match:
-                name_match = re.search(r'>(蔡永昊)<', content)  # 特定姓名匹配
         
         name = name_match.group(1).strip() if name_match else ""
         
@@ -188,52 +177,41 @@ def update_data_json(student_name, course_id, use_test_file=False, test_file_nam
 
 def get_class_info(headers):
     """获取班级信息"""
-    print("\n=== 获取班级信息 ===")
-    
     # 创建新的session确保无缓存
     session = requests.Session()
     session.headers.update(headers)
     
     # 访问主页
     home_url = "https://bjmf.k8n.cn/student"
-    print(f" 访问主页: {home_url}")
     
     try:
         response = session.get(home_url, timeout=10)
-        print(f" 主页响应状态码: {response.status_code}")
         
         # 不再以状态码200作为判断依据，而是以姓名是否返回的字段长度为空来判断cookie是否错误
-        print(" 主页访问完成，开始提取班级信息...")
         content = response.text
-        print(f" 页面内容长度: {len(content)} 字符")
         
         # 查找班级码
         class_code_pattern = r'班级码[：:]\s*([A-Z0-9]+)'
         codes = re.findall(class_code_pattern, content)
-        print(f" 找到班级码: {codes}")
         
         # 如果没有找到班级码，尝试其他模式
         if not codes:
             # 查找类似 "班级码 3GPDWY" 的模式
             alt_pattern = r'班级码\s+([A-Z0-9]{4,8})'
             codes = re.findall(alt_pattern, content)
-            print(f" 通过备用模式找到班级码: {codes}")
         
         # 查找班级名称
         class_name_pattern = r'([\d]{4}级[^<>\n\r]{2,10})'
         names = re.findall(class_name_pattern, content)
-        print(f" 找到班级名称: {names}")
         
         # 如果没有找到班级名称，尝试其他模式
         if not names:
             # 查找类似 "2024级研究生" 的模式
             alt_name_pattern = r'(\d{4}级[^<>\n\r]{3,15})'
             names = re.findall(alt_name_pattern, content)
-            print(f" 通过备用模式找到班级名称: {names}")
         
         # 查找班级链接，提取课程ID
         class_links = re.findall(r'https://bjmf\.k8n\.cn/student/course/(\d+)', content)
-        print(f" 找到班级链接: {class_links}")
         
         # 如果没有找到班级链接，尝试其他模式
         if not class_links:
@@ -241,7 +219,6 @@ def get_class_info(headers):
             relative_links = re.findall(r'href=[\'"]/student/course/(\d+)[\'"]', content)
             if relative_links:
                 class_links = relative_links
-                print(f" 通过备用模式找到班级链接: {class_links}")
         
         # 组织班级信息
         classes = []
@@ -261,7 +238,6 @@ def get_class_info(headers):
             # 尝试其他方式查找班级信息
             general_pattern = r'([^<>]{2,15}(?:班|班级|级)[^<>]{0,10})'
             general_matches = re.findall(general_pattern, content)
-            print(f" 通过通用模式找到班级信息: {general_matches}")
             for match in general_matches[:3]:  # 取前3个匹配项
                 classes.append({
                     "class_code": "未知",
@@ -269,24 +245,9 @@ def get_class_info(headers):
                     "course_id": "未知"
                 })
         
-        if classes:
-            print(" 班级信息:")
-            for i, cls in enumerate(classes):
-                print(f"   {i+1}. 班级码: {cls['class_code']}")
-                print(f"      班级名称: {cls['class_name']}")
-                print(f"      班级代号: {cls['course_id']}")
-                # 添加调试信息，输出班级信息的class字段
-                print(f"      调试信息 - class字段: {cls}")
-        else:
-            print(" 未提取到班级信息")
-        
-        # 在获取班级信息成功后，输出班级信息的"class"，方便调试
-        print(f" 获取班级信息成功，班级信息: {classes}")
-        
         return classes
             
     except requests.exceptions.RequestException as e:
-        print(f" 主页访问异常: {e}")
         return []
 
 def main(use_test_file=False, test_file_name='data_test.json'):

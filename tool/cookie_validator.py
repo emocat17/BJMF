@@ -8,20 +8,15 @@ def validate_cookie(headers):
     is_valid: Boolean, 表示cookie是否有效
     user_info: Dict, 包含用户信息(name, student_id)或None
     """
-    print("\n=== 验证Cookie有效性 ===")
-    
     # 创建新的session确保无缓存
     session = requests.Session()
     session.headers.update(headers)
     
     # 访问个人页面
     profile_url = "https://bjmf.k8n.cn/student/my"
-    print(f" 访问个人页面: {profile_url}")
     
     try:
         response = session.get(profile_url, timeout=10)
-        print(f" 个人页面响应状态码: {response.status_code}")
-        
         # 提取用户姓名和学号
         content = response.text
         
@@ -52,13 +47,9 @@ def validate_cookie(headers):
         else:
             student_id = id_match.group(1).strip() if id_match else ""
         
-        print(f" 姓名: {name}")
-        print(f" 学号: {student_id}")
-        
         # 检查是否成功获取到用户信息
         # 以姓名是否返回的字段长度为空来判断cookie是否错误
         if len(name) == 0:
-            print(" Cookie无效：未能获取到有效的用户信息")
             return False, None
         
         user_info = {
@@ -66,11 +57,9 @@ def validate_cookie(headers):
             "student_id": student_id
         }
         
-        print(" Cookie有效")
         return True, user_info
             
     except requests.exceptions.RequestException as e:
-        print(f" 个人页面访问异常: {e}")
         return False, None
 
 def get_user_info(headers):

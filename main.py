@@ -141,13 +141,7 @@ if __name__ == "__main__":
         # 遍历所有学生，进行签到
         for student in students:
             try:
-                print("-----------------------------------------------")
-                # 输出当前时间
-                current_time = get_current_time()
-                print(f"当前时间: {current_time}")
-                
-                # 显示当前处理的学生
-                print(f"正在处理学生: {student.get('name', 'Unknown')}")
+                print("==============")
                 
                 # 构造请求头
                 headers = {
@@ -159,38 +153,40 @@ if __name__ == "__main__":
                 is_valid, user_info = validate_cookie(headers)
                 
                 if is_valid:
-                    print(f" 学生 {student.get('name', 'Unknown')} 的cookie有效，继续执行签到任务")
-                    
-                    # 获取并显示班级信息
-                    remember_cookie = extract_remember_cookie(student.get('cookie', ''))
-                    if remember_cookie:
-                        headers['Cookie'] = remember_cookie
-                        user_profile = get_user_profile(headers)
-                        if user_profile:
-                            print(f" 用户姓名: {user_profile['name']}")
-                            print(f" 用户学号: {user_profile['student_id']}")
-                            
-                            # 获取班级信息
-                            class_info = get_class_info(headers)
-                            if class_info:
-                                print(" 班级信息:")
-                                for i, cls in enumerate(class_info):
-                                    print(f"   {i+1}. 班级码: {cls['class_code']}")
-                                    print(f"      班级名称: {cls['class_name']}")
-                                    if cls.get('course_id') and cls['course_id'] != "未知":
-                                        print(f"      班级代号: {cls['course_id']}")
-                            else:
-                                print(" 未获取到班级信息")
-                        else:
-                            print(" 无法获取用户信息")
+                    print("cookie有效性验证：有效")
+                    # 输出用户信息
+                    print(f" 姓名: {user_info['name']}")
+                    print(f" 学号: {user_info['student_id']}")
+                    print(f"{user_info['name']}  {user_info['student_id']}")
+                        
+                    # 获取班级信息
+                    class_info = get_class_info(headers) if headers['Cookie'] else []
+                    if class_info:
+                        # 只显示第一个班级信息
+                        cls = class_info[0]
+                        class_code = cls.get('class_code', '未知')
+                        class_name = cls.get('class_name', '未知')
+                        course_id = cls.get('course_id', '未知') if cls.get('course_id') and cls['course_id'] != "未知" else '未知'
+                        print(f"{class_code} {class_name}  {course_id}")
                     else:
-                        print(" 无法提取有效的cookie信息")
+                        print("未知 未知  未知")
                     
-                    Task(student)
+                    # 执行签到任务并捕获输出
+                    try:
+                        Task(student)
+                    except Exception as task_e:
+                        print(f"签到任务执行失败: {task_e}")
                 else:
-                    print(f" 学生 {student.get('name', 'Unknown')} 的cookie无效，跳过该用户")
+                    print("cookie有效性验证：无效")
+                    print(f"{student.get('name', 'Unknown')}  未知")
+                    print("未知 未知  未知")
+                    print()
+                    print("未找到在进行的签到/不在签到时间内")
+                    
+                print("==============")
             except Exception as e:
                 print(f"处理学生 {student.get('name', 'Unknown')} 时发生错误: {e}，跳过该用户")
+                print("==============")
                 continue
                 
     except KeyboardInterrupt:

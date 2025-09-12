@@ -70,12 +70,9 @@ def Task(student):
         required_fields = ['name', 'class', 'lat', 'lng', 'acc', 'cookie']
         for field in required_fields:
             if field not in student or not student[field]:
-                print(f"错误: 学生配置缺少必要字段 '{field}' 或字段为空")
+                # print(f"错误: 学生配置缺少必要字段 '{field}' 或字段为空")
                 return
                 
-        current_time = get_current_time()  # 获取当前时间
-        print(f"当前时间: {current_time}")
-        
         name = student['name']
         ClassID = student['class']
         lat = student['lat']
@@ -87,11 +84,11 @@ def Task(student):
             Cookie_rs_match = re.search(r'remember_student_59ba36addc2b2f9401580f014c7f58ea4e30989d=[^;]+',
                                        student['cookie'])
             if not Cookie_rs_match:
-                print(f"错误: {name} 的cookie格式不正确，未找到有效的认证信息")
+                # print(f"错误: {name} 的cookie格式不正确，未找到有效的认证信息")
                 return
             Cookie_rs = Cookie_rs_match.group(0)  # 提取cookie
         except Exception as e:
-            print(f"错误: {name} 的cookie解析失败: {e}")
+            # print(f"错误: {name} 的cookie解析失败: {e}")
             return
             
         # 构造请求头以获取用户信息
@@ -103,12 +100,14 @@ def Task(student):
         # 获取并显示用户信息
         user_profile = get_user_profile(headers)
         if user_profile:
-            print(f"👤 用户姓名: {user_profile['name']}")
-            print(f"🆔 用户学号: {user_profile['student_id']}")
+            # print(f"👤 用户姓名: {user_profile['name']}")
+            # print(f"🆔 用户学号: {user_profile['student_id']}")
+            pass
         else:
-            print("❌ 无法获取用户信息")
+            # print("❌ 无法获取用户信息")
+            pass
             
-        print(f"当前任务：{name},{ClassID},{lat},{lng},{ACC}")
+        # print(f"当前任务：{name},{ClassID},{lat},{lng},{ACC}")
         QmsgKEY = student.get('QmsgKEY', '')
         WXKey = student.get('WXKey', '')
         
@@ -123,16 +122,16 @@ def Task(student):
         # 发送GET请求获取签到页面
         try:
             response = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
-            print(f"进入_{name}_账号界面响应: {response.status_code}")
+            # print(f"进入_{name}_账号界面响应: {response.status_code}")
             
             if response.status_code != 200:
-                print(f"错误: 获取 {name} 签到页面失败，状态码: {response.status_code}")
+                # print(f"错误: 获取 {name} 签到页面失败，状态码: {response.status_code}")
                 return
         except requests.exceptions.Timeout:
-            print(f"错误: 获取 {name} 签到页面超时")
+            # print(f"错误: 获取 {name} 签到页面超时")
             return
         except requests.exceptions.RequestException as e:
-            print(f"错误: 获取 {name} 签到页面时发生网络异常: {e}")
+            # print(f"错误: 获取 {name} 签到页面时发生网络异常: {e}")
             return
 
         # 查找扫码签到项
@@ -144,7 +143,7 @@ def Task(student):
 
         # 处理每个签到项
         for match in matches:
-            print(f"签到项: {match}")
+            # print(f"签到项: {match}")
             url1 = f"http://g8n.cn/student/punchs/course/{ClassID}/{match}"
             payload = {
                 'id': match,
@@ -166,7 +165,7 @@ def Task(student):
                 continue
 
             if response.status_code == 200:
-                print("请求成功")
+                # print("请求成功")
                 try:
                     soup_response = BeautifulSoup(response.text, 'html.parser')
                     title_div = soup_response.find('div', id='title')
@@ -183,26 +182,32 @@ def Task(student):
                             if QmsgKEY:
                                 try:
                                     if sendQQmessage(QmsgKEY):
-                                        print("存在QmsgKEY，消息发送成功")
+                                        pass
+                                        # print("存在QmsgKEY，消息发送成功")
                                     else:
-                                        print("存在QmsgKEY，但消息发送失败")
+                                        pass
+                                        # print("存在QmsgKEY，但消息发送失败")
                                 except Exception as e:
-                                    print(f"发送QQ消息时发生异常: {e}")
-                            else:
-                                print("QmsgKEY为空，未发送消息")
+                                    pass
+                                    # print(f"发送QQ消息时发生异常: {e}")
+                            # else:
+                                # print("QmsgKEY为空，未发送消息")
 
                             if WXKey:
                                 try:
                                     if wx_send(WXKey):
-                                        print("存在WXServerKey，消息发送成功")
+                                        pass
+                                        # print("存在WXServerKey，消息发送成功")
                                     else:
-                                        print("存在WXServerKey，但消息发送失败")
+                                        pass
+                                        # print("存在WXServerKey，但消息发送失败")
                                 except Exception as e:
-                                    print(f"发送微信消息时发生异常: {e}")
-                            else:
-                                print("WXServerKey为空，未发送消息")
-                    else:
-                        print("页面结构异常，未找到标题信息")
+                                    pass
+                                    # print(f"发送微信消息时发生异常: {e}")
+                                # else:
+                                    # print("WXServerKey为空，未发送消息")
+                    # else:
+                        # print("页面结构异常，未找到标题信息")
                 except Exception as e:
                     print(f"解析响应页面时发生错误: {e}")
             else:
