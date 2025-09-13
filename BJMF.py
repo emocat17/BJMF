@@ -182,8 +182,6 @@ def wx_send(key):
 # 签到任务
 def Task(student):
     try:
-        
-        
         # 先获取用户和班级信息
         user_info, class_info = get_user_and_class_info(student)
         
