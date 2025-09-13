@@ -17,19 +17,8 @@ def get_current_time():
     return now.strftime("%H:%M:%S")
 
 # 读取外部 JSON 文件中的数据
-if len(sys.argv) > 1:
-    if sys.argv[1] == 'test':
-        config_file = 'test_data.json'
-    elif sys.argv[1] == 'test_msg':
-        config_file = 'test_msg_data.json'
-    elif sys.argv[1] == 'test_class':
-        config_file = 'test_class_data.json'
-    elif sys.argv[1] == 'test_class_not_empty':
-        config_file = 'test_class_not_empty.json'
-    else:
-        config_file = 'data.json'
-else:
-    config_file = 'data.json'
+
+config_file = 'data.json'
 
 with open(config_file, 'r', encoding='utf-8') as file:
     json_data = json.load(file)
@@ -144,8 +133,10 @@ def get_user_and_class_info(student):
             print(f"获取班级信息页面失败，状态码: {response_class.status_code}")
         
         # 输出信息
-        print("===============================================")
-        print("============== 用户和班级信息 ===================")
+        current_time = get_current_time()  # 获取当前时间
+        # print(f"当前时间: {current_time}")
+        print(f"==============={current_time}===================")
+        print("=========== 用户和班级信息 ===============")
         print(f"用户姓名: {user_info.get('name', '未找到')}")
         print(f"班级名称: {class_info.get('class_name', '未找到')}")
         print(f"班级代号: {class_info.get('class_id', '未找到')}")
@@ -191,8 +182,7 @@ def wx_send(key):
 # 签到任务
 def Task(student):
     try:
-        current_time = get_current_time()  # 获取当前时间
-        print(f"当前时间: {current_time}")
+        
         
         # 先获取用户和班级信息
         user_info, class_info = get_user_and_class_info(student)
@@ -261,7 +251,7 @@ def Task(student):
             # x = BeautifulSoup(response.text, 'html.parser')
 
             if response.status_code == 200:
-                print("网络请求成功(等待cookie验证)")
+                print("网络请求成功")
                 soup_response = BeautifulSoup(response.text, 'html.parser')
                 title_div = soup_response.find('div', id='title')
 
@@ -339,8 +329,8 @@ if __name__ == "__main__":
                     user_name = user_info.get('name', '未找到')
                     if user_name == "未找到":
                         print(f"{student['name']}_cookie过期/无效")
-                        print("===============================================")
-                        print("===============================================\n\n\n")
+                        print("==========================================")
+                        print("==========================================\n\n")
                         continue
                     
                     # 获取从网页获取的班级ID
@@ -353,13 +343,13 @@ if __name__ == "__main__":
                         print(f"已为用户 {student['name']} 设置class字段为: {class_id}")
                     else:
                         print(f"无法获取用户 {student['name']} 的班级ID")
-                        print("===============================================")
-                        print("===============================================\n\n\n")
+                        print("==========================================")
+                        print("==========================================\n\n")
                         continue
                 
                 Task(student)
-                print("===============================================")
-                print("===============================================\n\n\n")
+                print("==========================================")
+                print("==========================================\n\n")
             
             # 保存更新后的配置到文件
             save_config(original_config, config_file)
