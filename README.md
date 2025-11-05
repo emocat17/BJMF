@@ -129,7 +129,7 @@ BJMF/
 
 ### 浏览器获取Cookie方法
 - 这个方法可以在任意时候使用
-- 电脑登录微信,点击签到项,使得浏览器打开签到页面
+- 电脑登录微信打开`http://g8n.cn/student/login?ref=%2Fstudent`,点登录,打开签到页面
   - [//]: # (![微信签到页面]&#40;doc/img1.jpg&#41;)
   - <img src="doc/img2.jpg" alt="微信签到页面" style="width: 50%; height: auto;">
   - [//]: # (![浏览器查看班级码]&#40;doc/img1.jpg&#41;)
