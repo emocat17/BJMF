@@ -1,5 +1,6 @@
 import sys
 import time
+import os
 from utils import (
     load_config, 
     save_config, 
@@ -10,7 +11,7 @@ from utils import (
     Task
 )
 
-#设置代理；用于Qmsg访问,网络连接错误时尝试
+#设置代理；网络连接错误时尝试
 # proxies = {
 #     "http": "http://127.0.0.1:7890",
 #     "https": "http://127.0.0.1:7890"
@@ -18,9 +19,14 @@ from utils import (
 
 if __name__ == "__main__":
     try:
+        # 获取脚本所在目录的绝对路径
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        # 构建data.json的绝对路径
+        config_path = os.path.join(script_dir, 'data.json')
+        
         # 遍历所有学生，进行签到
         # 先读取原始配置文件用于更新
-        original_config = load_config('data.json')
+        original_config = load_config(config_path)
         students = original_config.get('students', [])
         
         for i, student in enumerate(students):
@@ -56,7 +62,7 @@ if __name__ == "__main__":
             print("===============================================\n\n\n")
         
         # 保存更新后的配置到文件
-        save_config(original_config, 'data.json')
+        save_config(original_config, config_path)
     except KeyboardInterrupt:
         print("程序被手动中断")
     finally:
