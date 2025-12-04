@@ -10,16 +10,5 @@
             "QmsgKEY": "",
             "WXKey": ""
         },
-
-        {
-            "name": "XXXXXX",
-            "class": "XXXXXX",
-            "lat": "XXXXXX",
-            "lng": "XXXXXX",
-            "acc": "30",
-            "cookie": "XXXXXXXX",
-            "QmsgKEY": "",
-            "WXKey": ""
-        }
     ]
 }
