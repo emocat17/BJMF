@@ -14,7 +14,7 @@
 ```
 BJMF/
 ├── BJMF.py                 # 主程序，负责整体流程控制
-├── audo_add_user.py        # 自动添加用户工具，通过微信扫码获取用户信息并写入配置data.json
+├── auto_add_user.py        # 自动添加用户工具，通过微信扫码获取用户信息并写入配置data.json
 └── utils/                  # 工具模块目录
     ├── __init__.py         # 模块初始化文件
     ├── config_manager.py   # 配置文件管理模块
@@ -26,7 +26,7 @@ BJMF/
 ### 各模块职责
 
 - **BJMF.py**: 主程序入口，负责读取配置、遍历用户、调用签到任务
-- **audo_add_user.py**: 自动添加用户工具，通过微信扫码获取用户信息并写入data.json配置文件
+- **auto_add_user.py**: 自动添加用户工具，通过微信扫码获取用户信息并写入data.json配置文件
 - **config_manager.py**: 处理配置文件的读取和保存
 - **user_info.py**: 获取用户信息和班级信息
 - **notification.py**: 处理QQ和微信消息发送
@@ -43,7 +43,7 @@ BJMF/
 ## 更新说明
 
 - 2025.12.04 v2版本
-  - 新增 `audo_add_user.py` 工具，实现微信扫码自动获取用户信息并写入配置文件data.json,
+  - 新增 `auto_add_user.py` 工具，实现微信扫码自动获取用户信息并写入配置文件data.json,
     - 无需手动获取Cookie和班级ID,直接通过微信扫码即可添加用户(但是依旧需要在data.json中根据签到范围配置经纬度)
   - 简化了用户添加流程，无需手动获取Cookie和班级ID
 
@@ -153,7 +153,7 @@ BJMF/
 1. 确保已安装所有依赖（见安装依赖部分）
 2. 运行自动添加用户工具：
    ```
-   python audo_add_user.py
+   python auto_add_user.py
    ```
 3. 使用微信扫描弹出的二维码进行登录
 4. 程序会自动获取用户信息和班级信息，并写入data.json文件
