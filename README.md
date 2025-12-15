@@ -40,6 +40,10 @@ BJMF/
 - 签到成功后,发送QQ/WX消息通知(可选配,可以不用配置)
 
 ## 更新说明
+- 2025.12.15
+  - 更新 `utils/attendance.py` ,改用 requests.Session()防止获取签到项失败问题；同时增加了对 response.url 的检测
+
+
 
 - 2025.12.04 v2版本
   - 新增 `auto_add_user.py` 工具，实现微信扫码自动获取用户信息并写入配置文件data.json,
