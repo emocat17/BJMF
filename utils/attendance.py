@@ -105,6 +105,21 @@ def Task(student):
         matches = list(set(matches))
 
         if not matches:
+            # 尝试检测是否已经签到
+            soup_check = BeautifulSoup(response.text, 'html.parser')
+            
+            # 检查方式1: punch-success-info
+            success_info = soup_check.find(class_='punch-success-info')
+            if success_info and "已签到" in success_info.get_text():
+                print(f"检测到已完成签到: {success_info.get_text(strip=True)}")
+                return
+
+            # 检查方式2: punch-status
+            status_div = soup_check.find(class_='punch-status')
+            if status_div and "已签到" in status_div.get_text():
+                print(f"检测到已完成签到: {status_div.get_text(strip=True)}")
+                return
+
             print("未找到在进行的签到/不在签到时间内")
             print(f"Debug: Status Code: {response.status_code}")
             
