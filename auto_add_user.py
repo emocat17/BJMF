@@ -58,8 +58,23 @@ class QRCodeLogin:
             # 显示二维码
             image = Image.open('login_qrcode.png')
             image.show()
+            # 这里的close很重要，否则在Windows下可能无法删除文件
+            try:
+                image.close()
+            except:
+                pass
         else:
             print(f" 下载二维码失败，状态码: {response.status_code}")
+
+    def cleanup_qrcode(self):
+        """清理二维码文件"""
+        import os
+        if os.path.exists("login_qrcode.png"):
+            try:
+                os.remove("login_qrcode.png")
+                print("已清理过期的二维码文件")
+            except Exception as e:
+                print(f"清理二维码文件失败: {e}")
 
     def poll_login_status(self, max_attempts=20):
         """轮询登录状态"""
@@ -76,6 +91,8 @@ class QRCodeLogin:
                         if data.get('status'):
                             redirect_url = data.get('url')
                             print(f"登录成功！获取跳转URL: {redirect_url}")
+                            # 登录成功，清理二维码
+                            self.cleanup_qrcode()
                             return True, redirect_url
                         else:
                             print(f"等待扫码... ")
@@ -88,10 +105,15 @@ class QRCodeLogin:
             time.sleep(1)  # 等待1秒
 
         print("二维码已过期")
+        # 过期清理二维码
+        self.cleanup_qrcode()
         return False, None
 
     def run(self):
         """运行完整的二维码登录流程"""
+        # 运行前先清理可能存在的旧二维码
+        self.cleanup_qrcode()
+        
         print("=" * 50)
         print("微信扫码登录流程开始")
         print("=" * 50)
@@ -174,6 +196,38 @@ class StudentSession:
         return course_id
 
 
+def load_env_config():
+    """读取.env文件配置"""
+    import os
+    config = {
+        "ENABLE_COMMON_CONFIG": False,
+        "COMMON_LAT": "",
+        "COMMON_LNG": "",
+        "COMMON_ACC": "",
+        "COMMON_QMSG_KEY": "",
+        "COMMON_WX_KEY": ""
+    }
+    
+    if os.path.exists(".env"):
+        try:
+            with open(".env", "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line or line.startswith("#"): continue
+                    if "=" in line:
+                        key, value = line.split("=", 1)
+                        key = key.strip()
+                        value = value.strip()
+                        if key == "ENABLE_COMMON_CONFIG":
+                            config[key] = value.lower() == "true"
+                        elif key in config:
+                            config[key] = value
+            print("已加载.env配置")
+        except Exception as e:
+            print(f"读取.env文件失败: {e}")
+            
+    return config
+
 def main():
     """主函数"""
     # 创建QRCodeLogin实例
@@ -205,11 +259,8 @@ def main():
         # 调用user_info.py中的函数获取信息
         user_info, class_info = get_user_and_class_info(student)
         
-        # 清理临时文件
-        import os
-        if os.path.exists("login_qrcode.png"):
-            os.remove("login_qrcode.png")
-            print("\n二维码图片已清理")
+        # 清理临时文件 (已在流程中自动清理，此处保留作为双重保险)
+        qr_login.cleanup_qrcode()
         
         # 将获取到的信息写入data.json
         print("\n" + "=" * 50)
@@ -218,6 +269,10 @@ def main():
         
         import json
         import os
+        
+        # 读取环境配置
+        env_config = load_env_config()
+        use_common = env_config["ENABLE_COMMON_CONFIG"]
         
         # 定义data.json文件路径
         data_file = "data.json"
@@ -245,15 +300,30 @@ def main():
                 student_name = student["name"]
                 break
         
+        # 准备默认值
+        default_lat = ""
+        default_lng = ""
+        default_acc = "30"
+        default_qmsg = ""
+        default_wx = ""
+        
+        if use_common:
+            print("使用.env公共配置填充参数")
+            default_lat = env_config["COMMON_LAT"]
+            default_lng = env_config["COMMON_LNG"]
+            default_acc = env_config["COMMON_ACC"] if env_config["COMMON_ACC"] else "30"
+            default_qmsg = env_config["COMMON_QMSG_KEY"]
+            default_wx = env_config["COMMON_WX_KEY"]
+            
         new_student = {
             "name": student_name,
             "class": class_info.get("class_id", ""),
-            "lat": "",  # 自行添加
-            "lng": "",  # 自行添加
-            "acc": "30",  # 使用默认值
+            "lat": default_lat,
+            "lng": default_lng,
+            "acc": default_acc,
             "cookie": cookie,
-            "QmsgKEY": "",  # 默认为空
-            "WXKey": ""  # 默认为空
+            "QmsgKEY": default_qmsg,
+            "WXKey": default_wx
         }
         
         # 检查新用户是否已经存在于现有数据中
