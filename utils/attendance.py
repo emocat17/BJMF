@@ -16,6 +16,11 @@ def Task(student):
     
     Args:
         student (dict): 学生配置信息
+        
+    Returns:
+        tuple: (用户名, 签到状态) 
+               状态可能为: 'success'(成功), 'already_signed'(已签到), 'not_started'(未开始), 
+                          'no_sign_in'(无签到), 'error'(错误), 'skip'(跳过)
     """
     try:
         # 先获取用户和班级信息
@@ -25,7 +30,7 @@ def Task(student):
         user_name = user_info.get('name', '未找到')
         if user_name == "未找到":
             print(f"无法获取用户信息，可能是cookie过期或无效，跳过用户 {student['name']} 的签到任务")
-            return
+            return student.get('name', '未知'), 'skip'
             
         # 使用从网页获取的班级ID，如果获取失败则使用配置文件中的
         ClassID = class_info.get('class_id', student['class'])
@@ -41,7 +46,7 @@ def Task(student):
         class_name = class_info.get('class_name', '未找到')
         if class_name == "未找到" and not ClassID:
             print(f"无法获取班级信息，跳过用户 {name} 的签到任务")
-            return
+            return name, 'skip'
             
         lat = student['lat']
         lng = student['lng']
@@ -112,13 +117,13 @@ def Task(student):
             success_info = soup_check.find(class_='punch-success-info')
             if success_info and "已签到" in success_info.get_text():
                 print(f"检测到已完成签到: {success_info.get_text(strip=True)}")
-                return
+                return name, 'already_signed'
 
             # 检查方式2: punch-status
             status_div = soup_check.find(class_='punch-status')
             if status_div and "已签到" in status_div.get_text():
                 print(f"检测到已完成签到: {status_div.get_text(strip=True)}")
-                return
+                return name, 'already_signed'
 
             print("未找到在进行的签到/不在签到时间内")
             print(f"Debug: Status Code: {response.status_code}")
@@ -129,7 +134,7 @@ def Task(student):
             print("Debug: HTML saved to debug_html.txt")
             
             # print(f"Debug: Response Text Preview: {response.text[:200]}") # Uncomment for more details
-            return
+            return name, 'no_sign_in'
 
         # 处理每个签到项
         for match in matches:
@@ -156,25 +161,23 @@ def Task(student):
                     title_text = title_div.text.strip()
                     if "已签到" in title_text:
                         print("已签到！无需再次签到")
+                        return name, 'already_signed'
                     elif "未开始" in title_text:
                         print("未开始签到,请稍后")
+                        return name, 'not_started'
                     else:
                         print("本次签到成功")
-                        
-                        QmsgKEY = student.get('QmsgKEY')
-                        WXKey = student.get('WXKey')
-
-                        # 任意选择一种通知方式
-                        if QmsgKEY and QmsgKEY.strip():
-                            sendQQmessage(QmsgKEY)
-                            print("存在QmsgKEY，已发送消息")
-                        # 如果QmsgKEY为空，则不输出任何内容
-
-                        if WXKey and WXKey.strip():
-                            wx_send(WXKey)
-                            print("存在WXServerKey，已发送消息")
-                        # 如果WXKey为空，则不输出任何内容
+                        return name, 'success'
+                else:
+                    # 如果没有找到title_div，可能是签到成功但没有显示
+                    print("签到请求成功，但无法确定状态")
+                    return name, 'success'
             else:
                 print(f"请求失败，状态码: {response.status_code}")
+                return name, 'error'
+        
+        # 如果没有匹配到任何签到项，返回无签到状态
+        return name, 'no_sign_in'
     except Exception as e:
         print(f"发生错误{e}，跳过该配置......")
+        return student.get('name', '未知'), 'error'

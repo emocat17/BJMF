@@ -8,6 +8,7 @@ from utils import (
     get_user_and_class_info,
     sendQQmessage,
     wx_send,
+    send_summary_notification,
     Task
 )
 
@@ -29,6 +30,9 @@ if __name__ == "__main__":
         original_config = load_config(config_path)
         students = original_config.get('students', [])
         
+        # 收集所有签到结果
+        attendance_results = []
+        
         for i, student in enumerate(students):
             # 如果class字段为空，则先获取用户和班级信息来填充
             if not student.get('class') or student['class'].strip() == "":
@@ -39,6 +43,7 @@ if __name__ == "__main__":
                 user_name = user_info.get('name', '未找到')
                 if user_name == "未找到":
                     print(f"无法获取用户信息，可能是cookie过期或无效，跳过用户 {student['name']} 的签到任务")
+                    attendance_results.append((student['name'], 'skip'))
                     print("===============================================")
                     print("===============================================\n\n\n")
                     continue
@@ -53,16 +58,27 @@ if __name__ == "__main__":
                     print(f"已为用户 {student['name']} 设置class字段为: {class_id}")
                 else:
                     print(f"无法获取用户 {student['name']} 的班级ID")
+                    attendance_results.append((student['name'], 'skip'))
                     print("===============================================")
                     print("===============================================\n\n\n")
                     continue
             
-            Task(student)
+            # 执行签到任务并收集结果
+            result = Task(student)
+            if result:
+                attendance_results.append(result)
             print("===============================================")
             print("===============================================\n\n\n")
         
         # 保存更新后的配置到文件
         save_config(original_config, config_path)
+        
+        # 发送汇总通知
+        wx_key = original_config.get('WXKey', '')
+        if wx_key and wx_key.strip():
+            send_summary_notification(wx_key, attendance_results)
+        else:
+            print("未配置WXKey，跳过汇总通知")
     except KeyboardInterrupt:
         print("程序被手动中断")
     finally:

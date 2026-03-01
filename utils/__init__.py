@@ -5,7 +5,7 @@ BJMF工具包
 
 from .config_manager import load_config, save_config, get_students
 from .user_info import get_user_and_class_info, get_current_time
-from .notification import sendQQmessage, wx_send
+from .notification import sendQQmessage, wx_send, send_summary_notification
 from .attendance import Task
 
 __all__ = [
@@ -16,5 +16,6 @@ __all__ = [
     'get_current_time',
     'sendQQmessage',
     'wx_send',
+    'send_summary_notification',
     'Task'
 ]
