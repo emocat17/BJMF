@@ -88,13 +88,13 @@ def send_summary_notification(wx_key, results):
         # 生成描述
         desp_parts = []
         if success_list:
-            success_str = "，".join([f"{name}成功" for name in success_list])
+            success_str = "\n".join([f"{name}成功" for name in success_list])
             desp_parts.append(success_str)
         if failed_list:
-            failed_str = "，".join([f"{name}失败" for name in failed_list])
+            failed_str = "\n".join([f"{name}失败" for name in failed_list])
             desp_parts.append(failed_str)
         
-        desp = "，".join(desp_parts)
+        desp = "\n\n".join(desp_parts)
         
         # 发送通知
         url = f'https://sctapi.ftqq.com/{wx_key}.send'
