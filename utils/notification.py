@@ -7,22 +7,25 @@ import requests
 from .user_info import get_current_time
 
 
-def sendQQmessage(QmsgKEY):
+def sendQQmessage(QmsgKEY, msg: str | None = None):
     """
     发送QQ消息通知
-    
+
     Args:
         QmsgKEY (str): Qmsg API密钥
+        msg (str | None): 自定义消息内容；如果为空则使用默认的“签到成功！”模板
     """
+    if not QmsgKEY or not QmsgKEY.strip():
+        return
+
     try:
         url = f"https://qmsg.zendee.cn/send/{QmsgKEY}"
-        # headers = {'Content-Type': 'application/x-www-form-urlencoded'}
         current_time = get_current_time()  # 获取当前时间
+        content = msg or "签到成功！"
         message = {
-            "msg": f"{current_time}  签到成功！",
+            "msg": f"{current_time}  {content}",
         }
-        # response = requests.post(url, data=message, proxies=proxies)
-        response = requests.post(url, data=message)
+        response = requests.post(url, data=message, timeout=10)
         if response.status_code == 200:
             print("QQ消息发送成功")
         else:
@@ -31,22 +34,28 @@ def sendQQmessage(QmsgKEY):
         print(f"发送QQ消息时出错: {e}")
 
 
-def wx_send(key):
+def wx_send(key, text: str | None = None, desp: str | None = None):
     """
     发送微信消息通知
-    
+
     Args:
         key (str): 微信Server酱API密钥
+        text (str | None): 主标题/消息内容；如果为空则使用默认的“签到成功！”模板
+        desp (str | None): 详细描述，可选
     """
+    if not key or not key.strip():
+        return
+
     try:
         url = f'https://sctapi.ftqq.com/{key}.send'
         current_time = get_current_time()  # 获取当前时间
 
+        main_text = text or "签到成功！"
         data = {
-            'text': f"{current_time}  签到成功！",
-            'desp': "123123"
+            'text': f"{current_time}  {main_text}",
+            'desp': desp or "123123",
         }
-        response = requests.post(url, data=data)
+        response = requests.post(url, data=data, timeout=10)
         if response.status_code == 200:
             print("WX消息发送成功")
         else:

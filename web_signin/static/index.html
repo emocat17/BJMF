@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>Web 自动签到配置</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #020617;
+      --accent: #38bdf8;
+      --accent-soft: rgba(56, 189, 248, 0.15);
+      --border-subtle: #1e293b;
+      --text-main: #e5e7eb;
+      --text-soft: #9ca3af;
+      --danger: #f97373;
+      --success: #22c55e;
+      --radius-lg: 14px;
+    }
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+    .shell {
+      width: 100%;
+      max-width: 1080px;
+    }
+
+    /* 在桌面端整体放大约 30% */
+    @media (min-width: 00px) {
+      body {
+        padding: 24px;
+      }
+      .shell {
+        max-width: 1400px;
+        transform: scale(1);
+        transform-origin: top center;
+      }
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .title-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(59,130,246,0.15));
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+    }
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+    .layout {
+      display: grid;
+      /* 左侧缩窄一些，约占整体 30% 左右 */
+      grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+      gap: 16px;
+    }
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .card {
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 55%),
+                  radial-gradient(circle at bottom, rgba(15,23,42,0.9), #020617 65%);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      padding: 18px 18px 16px;
+      box-shadow:
+        0 24px 60px rgba(15,23,42,0.9),
+        0 0 0 1px rgba(15,23,42,0.9) inset;
+    }
+    /* 左侧主卡片：更紧凑一些 */
+    .card-main {
+      padding: 14px 14px 12px;
+    }
+    .card-secondary {
+      background: radial-gradient(circle at top right, rgba(56,189,248,0.16), transparent 55%),
+                  radial-gradient(circle at bottom, #020617, #020617 65%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      padding: 16px 16px 14px;
+      box-shadow:
+        0 18px 50px rgba(15,23,42,0.88),
+        0 0 0 1px rgba(15,23,42,1) inset;
+    }
+    .section-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 550;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #cbd5f5;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .section-title-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 6px rgba(56,189,248,0.24);
+    }
+    .section-caption {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+    .stepper {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .step {
+      flex: 1;
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-soft);
+      opacity: 0.7;
+      transition: opacity 0.18s ease;
+    }
+    .step.active {
+      opacity: 1;
+      color: var(--accent);
+    }
+    .step-badge {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.65);
+    }
+    .step.active .step-badge {
+      border-color: rgba(56,189,248,0.9);
+      background: radial-gradient(circle at top, rgba(56,189,248,0.35), rgba(15,23,42,0.85));
+      color: #e0f2fe;
+    }
+    .step-text-main {
+      font-weight: 500;
+    }
+    .step-text-sub {
+      font-size: 11px;
+    }
+    .qr-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      /* 让二维码整体稍微下移一点 */
+      margin-top: 70px;
+    }
+    .qr-box {
+      width: 260px;
+      height: 260px;
+      border-radius: 16px;
+      background: radial-gradient(circle at 20% 10%, rgba(56,189,248,0.5), transparent 55%),
+                  radial-gradient(circle at 85% 85%, rgba(59,130,246,0.4), transparent 60%),
+                  #020617;
+      border: none;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      position: relative;
+      overflow: hidden;
+    }
+    .qr-box::before {
+      content: "";
+      position: absolute;
+      inset: -80%;
+      background: conic-gradient(from 200deg, rgba(56,189,248,0.35), transparent 40%, transparent 60%, rgba(56,189,248,0.45), rgba(59,130,246,0.35), transparent);
+      opacity: 0.6;
+      filter: blur(26px);
+      mix-blend-mode: screen;
+    }
+    .qr-inner {
+      position: relative;
+      z-index: 1;
+      width: 88%;
+      height: 88%;
+      padding: 4px;
+      border-radius: 12px;
+      background: transparent;
+      box-shadow: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #qrImage {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+      border-radius: 8px;
+    }
+    .qr-placeholder {
+      font-size: 12px;
+      text-align: center;
+      color: var(--text-soft);
+      padding: 0 8px;
+    }
+    .meta {
+      flex: 1;
+      min-width: 0;
+    }
+    .meta-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 12px;
+    }
+    .pill {
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.8);
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot-online {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.4);
+    }
+    .dot-offline {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #f97373;
+      box-shadow: 0 0 0 4px rgba(248,113,113,0.35);
+    }
+    .hint-text {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+    .hint-strong {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+    .field-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 10px 12px;
+      margin-bottom: 10px;
+    }
+    /* 单列布局：用于经纬度等需要占满整行的区域，避免右侧大片留白 */
+    .field-grid-single {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    @media (max-width: 700px) {
+      .field-grid {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+    }
+    .field-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .label {
+      font-size: 12px;
+      color: var(--text-soft);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .label-tag {
+      padding: 1px 6px;
+      border-radius: 6px;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      color: #cbd5f5;
+    }
+    .label-link {
+      margin-left: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 16px;
+      height: 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      color: #9ca3af;
+      font-size: 10px;
+      text-decoration: none;
+      transition: background 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+    }
+    .label-link:hover {
+      border-color: rgba(56,189,248,0.85);
+      color: #e5e7eb;
+      background: rgba(15,23,42,0.9);
+    }
+    .input, .time-input {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid rgba(51, 65, 85, 0.85);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-main);
+      font-size: 12px;
+      padding: 7px 9px;
+      outline: none;
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+    .input:focus, .time-input:focus {
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow:
+        0 0 0 1px rgba(15,23,42,0.95) inset,
+        0 0 0 1px rgba(56,189,248,0.75),
+        0 16px 30px rgba(15,23,42,0.95);
+      background: rgba(15, 23, 42, 0.96);
+    }
+    /* 年份下拉单独放宽一点，避免年份被截断 */
+    .date-year-select {
+      min-width: 90px;
+      max-width: 110px;
+    }
+    /* 时间预设下拉宽度适中，方便点击 */
+    .time-preset-select {
+      max-width: 120px;
+      flex-shrink: 0;
+    }
+    .input[readonly] {
+      opacity: 0.8;
+      cursor: default;
+      background: rgba(15, 23, 42, 0.9);
+    }
+    .time-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+    .time-pill {
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 11px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.9);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .time-pill button {
+      border: none;
+      padding: 0;
+      margin: 0;
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      background: rgba(15,23,42,0.9);
+      color: rgba(248,113,113,0.9);
+      cursor: pointer;
+    }
+    .time-pill button:hover {
+      background: rgba(30,64,175,0.85);
+    }
+    .btn-row {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 6px;
+    }
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.8);
+      background: rgba(15,23,42,0.98);
+      color: #e5e7eb;
+      font-size: 12px;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 500;
+      transition: background 0.18s ease, border-color 0.18s ease, transform 0.1s ease, box-shadow 0.18s ease;
+    }
+    .btn-primary {
+      border-color: transparent;
+      background: linear-gradient(135deg, #38bdf8, #4f46e5);
+      color: #0b1120;
+      box-shadow:
+        0 14px 35px rgba(56,189,248,0.5),
+        0 0 0 1px rgba(15,23,42,0.95) inset;
+    }
+    .btn-primary:hover {
+      box-shadow:
+        0 18px 45px rgba(56,189,248,0.65),
+        0 0 0 1px rgba(15,23,42,0.95) inset;
+      transform: translateY(-1px);
+    }
+    .btn:active {
+      transform: translateY(0);
+      box-shadow:
+        0 8px 20px rgba(15,23,42,0.9),
+        0 0 0 1px rgba(15,23,42,1) inset;
+    }
+    .btn-ghost {
+      border-style: dashed;
+      border-color: rgba(148,163,184,0.65);
+      background: rgba(15,23,42,0.9);
+      color: var(--text-soft);
+    }
+    .btn-ghost:hover {
+      border-color: rgba(148,163,184,1);
+      color: #e5e7eb;
+    }
+    .status-bar {
+      margin-top: 10px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .status-text {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #6b7280;
+    }
+    .status-dot.running {
+      background: #38bdf8;
+      box-shadow: 0 0 0 4px rgba(56,189,248,0.4);
+    }
+    .status-dot.success {
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.5);
+    }
+    .status-dot.error {
+      background: #f97373;
+      box-shadow: 0 0 0 4px rgba(248,113,113,0.45);
+    }
+    .status-label {
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.15em;
+      color: #9ca3af;
+    }
+    .status-message {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+    .status-message strong {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+    .badge {
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      border: 1px solid rgba(148,163,184,0.7);
+      background: rgba(15,23,42,0.9);
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="header">
+      <div>
+        <div class="title">
+          <span class="title-pill">Web Sign-in</span>
+          <span>班级魔法平台自动签到</span>
+        </div>
+        <div class="subtitle">扫码一次，配置到位，后端按时替你签到。</div>
+      </div>
+      <div class="badge">仅本地展示基础信息 · Cookie 始终只在后端</div>
+    </div>
+
+    <div class="layout">
+      <div class="card card-main">
+        <!-- 原左侧 Step Flow 流程已按需求移除 -->
+
+        <div class="qr-wrapper">
+          <div class="qr-box">
+            <div class="qr-inner">
+              <img id="qrImage" alt="登录二维码" style="display:none" />
+              <div class="qr-placeholder" id="qrPlaceholder">
+                点击右下角「生成二维码」按钮，<br />使用手机微信扫码登录教学平台。
+              </div>
+            </div>
+          </div>
+
+          <div class="meta">
+            <div class="meta-row">
+              <span class="pill">
+                <span id="onlineDot" class="dot-offline"></span>
+                <span id="onlineText">后端状态：未知</span>
+              </span>
+            </div>
+            <div>
+              <span class="pill">
+                <span>扫码会话</span>
+                <span id="tokenShort">未创建</span>
+              </span>
+            </div>
+            <div class="hint-text" id="hintText">
+              <span class="hint-strong">说明：</span>
+              每次点击「生成二维码」都会启动一轮新的扫码会话（约 2 分钟内有效）。
+            </div>
+            <div class="btn-row" style="margin-top:10px">
+              <button class="btn btn-ghost" id="btnHealth">
+                <span>检测服务</span>
+              </button>
+              <button class="btn btn-primary" id="btnCreateQr">
+                <span>生成二维码</span>
+              </button>
+            </div>
+            <div class="status-bar">
+              <div class="status-text">
+                <span id="qrStatusDot" class="status-dot"></span>
+                <span class="status-label">QR Session</span>
+              </div>
+              <div class="status-message" id="qrStatusMessage">尚未开始扫码。</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-secondary">
+        <div class="section-header">
+          <div class="section-title">
+            <span class="section-title-dot"></span>
+            <span>Task Config</span>
+          </div>
+          <div class="section-caption">
+            扫码成功后会自动填充账号信息。
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field">
+            <div class="label">
+              <span class="label-tag">Account</span>
+              <span>姓名</span>
+            </div>
+            <input id="name" class="input" type="text" readonly placeholder="扫码后自动识别" />
+          </div>
+          <div class="field">
+            <div class="label">
+              <span class="label-tag">Class</span>
+              <span>班级</span>
+            </div>
+            <input id="classInfo" class="input" type="text" readonly placeholder="扫码后自动识别" />
+          </div>
+        </div>
+
+        <div class="field-grid field-grid-single">
+          <div class="field">
+            <div class="label">
+              <span class="label-tag">Location</span>
+              <span>经纬度</span>
+            </div>
+            <div class="field-row">
+              <input
+                id="coord"
+                class="input"
+                type="text"
+                placeholder="例如 26.056756 119.196135（可使用空格、逗号、竖线等任意分隔符）"
+              />
+              <button class="btn btn-ghost" id="btnCoordPicker" style="flex-shrink:0;padding-inline:10px">
+                坐标拾取
+              </button>
+            </div>
+            <div class="hint-text">
+              <span class="hint-strong">提示：</span>
+              可以直接从地图复制整段经纬度，使用空格、逗号、竖线等任意符号分隔，后端会自动解析。
+            </div>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <div class="field">
+            <div class="label">
+              <span class="label-tag">Notify</span>
+              <span>微信通知 Key（可选）</span>
+              <a class="label-link" href="https://sct.ftqq.com/" target="_blank" rel="noopener noreferrer" title="前往 Server 酱官网获取 Key">↗</a>
+            </div>
+            <input id="wxKey" class="input" type="text" placeholder="例如 Server 酱 Key" />
+          </div>
+          <div class="field">
+            <div class="label">
+              <span class="label-tag">Notify</span>
+              <span>QQ 通知 Key（可选）</span>
+              <a class="label-link" href="https://qmsg.zendee.cn/" target="_blank" rel="noopener noreferrer" title="前往 Qmsg 酱官网获取 Key">↗</a>
+            </div>
+            <input id="qqKey" class="input" type="text" placeholder="例如 Qmsg 酱 Key" />
+          </div>
+        </div>
+
+
+        <div class="field">
+          <div class="label">
+            <span class="label-tag">Schedule</span>
+            <span>执行时间点（支持秒）</span>
+          </div>
+          <div class="field-row">
+            <input id="timeInput" class="time-input" type="time" step="1" />
+            <select id="timePreset" class="time-input time-preset-select">
+              <option value="">常用时间</option>
+              <option value="07:10:00">07:10:00</option>
+              <option value="07:30:00">07:30:00</option>
+              <option value="08:00:00">08:00:00</option>
+              <option value="12:00:00">12:00:00</option>
+              <option value="18:00:00">18:00:00</option>
+              <option value="22:00:00">22:00:00</option>
+            </select>
+            <button class="btn btn-ghost" id="btnAddTime" style="flex-shrink:0;padding-inline:12px">
+              添加时间
+            </button>
+          </div>
+          <div id="timeList" class="time-list"></div>
+        </div>
+
+        <div class="field">
+          <div class="label">
+            <span class="label-tag">Range</span>
+            <span>日期范围（可选）</span>
+          </div>
+          <div class="field-row">
+            <div class="field-row" style="gap:6px">
+              <select id="dateStartYear" class="time-input date-year-select"></select>
+              <select id="dateStartMonth" class="time-input"></select>
+              <select id="dateStartDay" class="time-input"></select>
+            </div>
+            <span style="color:var(--text-soft);font-size:12px;">~</span>
+            <div class="field-row" style="gap:6px">
+              <select id="dateEndYear" class="time-input date-year-select"></select>
+              <select id="dateEndMonth" class="time-input"></select>
+              <select id="dateEndDay" class="time-input"></select>
+            </div>
+          </div>
+          <div class="hint-text">
+            <span class="hint-strong">说明：</span>不填则默认每天都执行；只填开始日期表示从该日开始长期执行，结束日期留空。
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="btnSubmitTask">
+            提交签到任务
+          </button>
+          <button class="btn btn-ghost" id="btnViewLogs" style="margin-left:8px">
+            查看最近执行日志
+          </button>
+        </div>
+
+        <div class="status-bar">
+          <div class="status-text">
+            <span id="taskStatusDot" class="status-dot"></span>
+            <span class="status-label">Task</span>
+          </div>
+          <div class="status-message" id="taskStatusMessage">等待扫码登录完成后再提交任务。</div>
+        </div>
+
+        <div id="taskLogPanel" class="log-panel" style="margin-top:12px;display:none">
+          <div class="log-panel-header">
+            <span class="log-panel-title">最近执行日志</span>
+            <button class="btn btn-ghost" id="btnHideLogs" style="padding-inline:8px;font-size:12px">
+              收起
+            </button>
+          </div>
+          <div id="taskLogList" class="log-list">
+            <div class="hint-text">暂无日志，请等待任务执行后再查看。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const apiBase = "";
+
+    const qrImg = document.getElementById("qrImage");
+    const qrPlaceholder = document.getElementById("qrPlaceholder");
+    const qrStatusDot = document.getElementById("qrStatusDot");
+    const qrStatusMessage = document.getElementById("qrStatusMessage");
+    const qrCountdown = document.getElementById("qrCountdown");
+    const qrCountdownText = document.getElementById("qrCountdownText");
+    const taskStatusDot = document.getElementById("taskStatusDot");
+    const taskStatusMessage = document.getElementById("taskStatusMessage");
+    const tokenShort = document.getElementById("tokenShort");
+    const onlineDot = document.getElementById("onlineDot");
+    const onlineText = document.getElementById("onlineText");
+    const hintText = document.getElementById("hintText");
+    // 原左侧 Step Flow 流程已从结构中移除，这里可能拿不到对应元素，做兼容处理
+    const step1 = document.getElementById("step1");
+    const step2 = document.getElementById("step2");
+    const step3 = document.getElementById("step3");
+
+    const nameInput = document.getElementById("name");
+    const classInfoInput = document.getElementById("classInfo");
+    const coordInput = document.getElementById("coord");
+    const wxKeyInput = document.getElementById("wxKey");
+    const qqKeyInput = document.getElementById("qqKey");
+    const timeInput = document.getElementById("timeInput");
+    const timePreset = document.getElementById("timePreset");
+    const dateStartYear = document.getElementById("dateStartYear");
+    const dateStartMonth = document.getElementById("dateStartMonth");
+    const dateStartDay = document.getElementById("dateStartDay");
+    const dateEndYear = document.getElementById("dateEndYear");
+    const dateEndMonth = document.getElementById("dateEndMonth");
+    const dateEndDay = document.getElementById("dateEndDay");
+    const timeListEl = document.getElementById("timeList");
+
+    const btnHealth = document.getElementById("btnHealth");
+    const btnCreateQr = document.getElementById("btnCreateQr");
+    const btnLocate = document.getElementById("btnLocate");
+    const btnCoordPicker = document.getElementById("btnCoordPicker");
+    const btnAddTime = document.getElementById("btnAddTime");
+    const btnSubmitTask = document.getElementById("btnSubmitTask");
+    const btnViewLogs = document.getElementById("btnViewLogs");
+    const btnHideLogs = document.getElementById("btnHideLogs");
+
+    const taskLogPanel = document.getElementById("taskLogPanel");
+    const taskLogList = document.getElementById("taskLogList");
+
+    let currentToken = null;
+    let currentTaskId = null;
+    let pollTimer = null;
+    let qrPendingCountdownTimer = null;
+    let timeList = [];
+
+    // 选择常用时间时，自动填充到时间输入框中，仍然允许手动修改
+    if (timePreset) {
+      timePreset.addEventListener("change", () => {
+        if (!timePreset.value) return;
+        timeInput.value = timePreset.value;
+      });
+    }
+
+    function initDateSelect(prefix, yearEl, monthEl, dayEl) {
+      if (!yearEl || !monthEl || !dayEl) return;
+      const now = new Date();
+      const startYear = now.getFullYear() - 1;
+      const endYear = now.getFullYear() + 3;
+
+      yearEl.innerHTML = "";
+      const emptyYear = document.createElement("option");
+      emptyYear.value = "";
+      emptyYear.textContent = "年";
+      yearEl.appendChild(emptyYear);
+      for (let y = startYear; y <= endYear; y++) {
+        const opt = document.createElement("option");
+        opt.value = String(y);
+        opt.textContent = y + "年";
+        yearEl.appendChild(opt);
+      }
+
+      monthEl.innerHTML = "";
+      const emptyMonth = document.createElement("option");
+      emptyMonth.value = "";
+      emptyMonth.textContent = "月";
+      monthEl.appendChild(emptyMonth);
+      for (let m = 1; m <= 12; m++) {
+        const opt = document.createElement("option");
+        opt.value = String(m).padStart(2, "0");
+        opt.textContent = m + "月";
+        monthEl.appendChild(opt);
+      }
+
+      function refreshDays() {
+        const y = parseInt(yearEl.value, 10);
+        const m = parseInt(monthEl.value, 10);
+        dayEl.innerHTML = "";
+        const emptyDay = document.createElement("option");
+        emptyDay.value = "";
+        emptyDay.textContent = "日";
+        dayEl.appendChild(emptyDay);
+        if (!y || !m) return;
+        const daysInMonth = new Date(y, m, 0).getDate();
+        for (let d = 1; d <= daysInMonth; d++) {
+          const opt = document.createElement("option");
+          opt.value = String(d).padStart(2, "0");
+          opt.textContent = d + "日";
+          dayEl.appendChild(opt);
+        }
+      }
+
+      yearEl.addEventListener("change", refreshDays);
+      monthEl.addEventListener("change", refreshDays);
+
+      // 初始填充一次天数（此时会只包含“日”占位）
+      refreshDays();
+    }
+
+    function getDateFromSelect(yearEl, monthEl, dayEl) {
+      if (!yearEl || !monthEl || !dayEl) return null;
+      const y = yearEl.value;
+      const m = monthEl.value;
+      const d = dayEl.value;
+      if (!y || !m || !d) return null;
+      return `${y}-${m}-${d}`;
+    }
+
+    function setDateToSelect(yearEl, monthEl, dayEl, value) {
+      if (!yearEl || !monthEl || !dayEl) return;
+      if (!value) {
+        yearEl.value = "";
+        monthEl.value = "";
+        dayEl.value = "";
+        return;
+      }
+      const parts = value.slice(0, 10).split("-");
+      if (parts.length !== 3) return;
+      const [y, m, d] = parts;
+      yearEl.value = y;
+      // 触发一次月份和日期的刷新逻辑
+      const evt = new Event("change");
+      yearEl.dispatchEvent(evt);
+      monthEl.value = m;
+      monthEl.dispatchEvent(evt);
+      dayEl.value = d;
+    }
+
+    function setQrStatus(status, message) {
+      qrStatusDot.className = "status-dot";
+      if (status === "running") qrStatusDot.classList.add("running");
+      if (status === "success") qrStatusDot.classList.add("success");
+      if (status === "error") qrStatusDot.classList.add("error");
+      qrStatusMessage.textContent = message;
+
+      // 只在“等待扫码和确认中…”状态下展示 20 秒倒计时
+      if (qrPendingCountdownTimer) {
+        clearInterval(qrPendingCountdownTimer);
+        qrPendingCountdownTimer = null;
+      }
+      if (!qrCountdown || !qrCountdownText) return;
+
+      if (status === "running" && message.startsWith("等待扫码和确认中")) {
+        let remain = 20;
+        qrCountdown.style.display = "block";
+        qrCountdownText.textContent = `距本次扫码会话结束还剩 ${remain} 秒。`;
+        qrPendingCountdownTimer = setInterval(() => {
+          remain -= 1;
+          if (remain <= 0) {
+            clearInterval(qrPendingCountdownTimer);
+            qrPendingCountdownTimer = null;
+            qrCountdownText.textContent = "本次扫码会话即将结束，如未完成可稍后重新生成二维码。";
+            return;
+          }
+          qrCountdownText.textContent = `距本次扫码会话结束还剩 ${remain} 秒。`;
+        }, 1000);
+      } else {
+        qrCountdown.style.display = "none";
+      }
+    }
+
+    function setTaskStatus(status, message) {
+      taskStatusDot.className = "status-dot";
+      if (status === "running") taskStatusDot.classList.add("running");
+      if (status === "success") taskStatusDot.classList.add("success");
+      if (status === "error") taskStatusDot.classList.add("error");
+      taskStatusMessage.textContent = message;
+    }
+
+    function setOnline(ok) {
+      onlineDot.className = ok ? "dot-online" : "dot-offline";
+      onlineText.textContent = ok ? "后端状态：在线" : "后端状态：不可用";
+    }
+
+    async function checkHealth() {
+      try {
+        const resp = await fetch(apiBase + "/health");
+        const data = await resp.json();
+        setOnline(data.status === "ok");
+      } catch (e) {
+        setOnline(false);
+      }
+    }
+
+    async function createQr(fromAuto = false) {
+      // 兼容按钮点击（事件对象）
+      if (typeof fromAuto === "object") {
+        fromAuto = false;
+      }
+
+      if (pollTimer) {
+        clearInterval(pollTimer);
+        pollTimer = null;
+      }
+
+      // 每次轮换都会获取一个全新的会话与二维码
+      currentToken = null;
+      qrImg.style.display = "none";
+      qrPlaceholder.style.display = "block";
+      if (!fromAuto) {
+        nameInput.value = "";
+        classInfoInput.value = "";
+      }
+      setQrStatus("running", fromAuto ? "正在自动刷新登录二维码…" : "正在向后端请求新的二维码…");
+      // 这些 step 元素在当前页面结构中可能不存在，调用前先判断
+      if (step1) step1.classList.add("active");
+      if (step2) step2.classList.remove("active");
+      if (step3) step3.classList.remove("active");
+      hintText.textContent = "请使用手机微信扫码当前二维码，如长时间未扫码导致失效，可再次点击「生成二维码」重新获取。";
+
+      try {
+        const resp = await fetch(apiBase + "/api/qr");
+        if (!resp.ok) {
+          throw new Error("HTTP " + resp.status);
+        }
+        const data = await resp.json();
+        currentToken = data.token;
+        // 显示完整会话标识，便于复制与核对
+        tokenShort.textContent = data.token || "未创建";
+        if (data.qrcode) {
+          qrImg.src = data.qrcode;
+          qrImg.style.display = "block";
+          qrPlaceholder.style.display = "none";
+          setQrStatus("running", "二维码已生成，请使用手机微信扫码并确认登录。");
+        } else {
+          setQrStatus("error", "后端未返回二维码数据。");
+        }
+        startPolling();
+      } catch (e) {
+        console.error(e);
+        setQrStatus("error", "获取二维码失败，请稍后重试。");
+      }
+    }
+
+    async function loadUserConfigAfterLogin() {
+      if (!currentToken) return;
+      try {
+        const resp = await fetch(apiBase + "/api/user/config?token=" + encodeURIComponent(currentToken));
+        if (!resp.ok) {
+          return;
+        }
+        const data = await resp.json();
+        if (!data || !data.has_task || !data.config) {
+          // 该账号还没有任何任务配置，保持为空让用户首次填写
+          return;
+        }
+        const cfg = data.config;
+        // 回填地点
+        if (cfg.lat && cfg.lng) {
+          coordInput.value = cfg.lat + " " + cfg.lng;
+        }
+        // 回填通知 key
+        if (typeof cfg.wx_key === "string") {
+          wxKeyInput.value = cfg.wx_key;
+        }
+        if (typeof cfg.qq_key === "string") {
+          qqKeyInput.value = cfg.qq_key;
+        }
+        // 回填时间列表
+        if (Array.isArray(cfg.times)) {
+          timeList = [...cfg.times];
+          renderTimeList();
+        }
+        // 回填日期范围（可选）
+        if (cfg.date_start) {
+          setDateToSelect(dateStartYear, dateStartMonth, dateStartDay, cfg.date_start);
+        }
+        if (cfg.date_end) {
+          setDateToSelect(dateEndYear, dateEndMonth, dateEndDay, cfg.date_end);
+        }
+        // 如果后端认为 cookie 已变化，给出一次性提示
+        if (data.cookie_changed) {
+          alert("检测到本次扫码获得的新 Cookie 与之前存储的不一致，说明旧登录已过期，本次已自动更新为新的 Cookie。");
+        } else {
+          setTaskStatus("running", "已根据历史配置自动填充表单，如需修改可直接编辑后重新提交。");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    async function pollStatus() {
+      if (!currentToken) return;
+      try {
+        const resp = await fetch(apiBase + "/api/qr/status?token=" + encodeURIComponent(currentToken));
+        if (!resp.ok) return;
+        const data = await resp.json();
+        if (data.status === "pending") {
+          setQrStatus("running", "等待扫码和确认中…");
+          return;
+        }
+        if (data.status === "expired") {
+          if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+          }
+          setQrStatus("error", "二维码已过期，请重新生成。");
+          hintText.textContent = "二维码有效期约 2 分钟，过期后请点击「生成二维码」重新开始。";
+          return;
+        }
+        if (data.status === "error") {
+          if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+          }
+          setQrStatus("error", data.error || "扫码过程中发生错误，请重试。");
+          return;
+        }
+        if (data.status === "success") {
+          if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+          }
+          setQrStatus("success", "扫码登录成功，已获取账号信息。二维码已失效，可直接进行后续配置。");
+          // 二维码本身已完成使命，隐藏图片，避免误以为仍可继续使用
+          qrImg.style.display = "none";
+          qrPlaceholder.style.display = "block";
+          qrPlaceholder.innerHTML = "已成功获取账号信息。<br />下面只需配置地点、时间和通知方式即可，无需再次扫码。";
+          if (step1) step1.classList.remove("active");
+          if (step2) step2.classList.add("active");
+          if (step3) step3.classList.add("active");
+
+          if (data.user) {
+            nameInput.value = data.user.name || "";
+            const classStr = [data.user.class_name, data.user.class_code].filter(Boolean).join(" / ");
+            classInfoInput.value = classStr || "";
+          }
+          // 尝试根据历史任务记录自动回填配置；若没有历史记录则仍保持空表单
+          await loadUserConfigAfterLogin();
+          if (!coordInput.value || !timeList.length) {
+            setTaskStatus("running", "请完善地点、时间和通知配置后提交任务。");
+          }
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function startPolling() {
+      if (pollTimer) clearInterval(pollTimer);
+      pollTimer = setInterval(pollStatus, 2000);
+    }
+
+    function renderTimeList() {
+      timeListEl.innerHTML = "";
+      if (!timeList.length) return;
+      timeList.forEach((t, idx) => {
+        const pill = document.createElement("div");
+        pill.className = "time-pill";
+        pill.textContent = t;
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = "×";
+        btn.title = "删除";
+        btn.addEventListener("click", () => {
+          timeList.splice(idx, 1);
+          renderTimeList();
+        });
+        pill.appendChild(btn);
+        timeListEl.appendChild(pill);
+      });
+    }
+
+    function addTime() {
+      let value = timeInput.value;
+      if (!value) return;
+      // 允许 HH:MM 或 HH:MM:SS；若仅到分钟，则补齐为 HH:MM:00
+      if (!/^\d{2}:\d{2}(:\d{2})?$/.test(value)) {
+        alert("时间格式应为 HH:MM 或 HH:MM:SS");
+        return;
+      }
+      if (/^\d{2}:\d{2}$/.test(value)) {
+        value = value + ":00";
+      }
+      if (!timeList.includes(value)) {
+        timeList.push(value);
+        timeList.sort();
+        renderTimeList();
+      }
+      timeInput.value = "";
+    }
+
+    async function submitTask() {
+      if (!currentToken) {
+        setTaskStatus("error", "请先完成扫码登录，再提交任务。");
+        return;
+      }
+      if (!nameInput.value) {
+        setTaskStatus("error", "尚未识别到账号信息，请确认扫码登录已完成。");
+        return;
+      }
+      const coord = coordInput.value.trim();
+      if (!coord) {
+        setTaskStatus("error", "请填写经纬度信息（可以直接粘贴整段内容）。");
+        return;
+      }
+      if (!timeList.length) {
+        setTaskStatus("error", "请至少添加一个执行时间点。");
+        return;
+      }
+
+      const date_start = getDateFromSelect(dateStartYear, dateStartMonth, dateStartDay);
+      const date_end = getDateFromSelect(dateEndYear, dateEndMonth, dateEndDay);
+      setTaskStatus("running", "正在提交任务到后端…");
+      try {
+        const resp = await fetch(apiBase + "/api/tasks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            token: currentToken,
+            coord,
+            wx_key: wxKeyInput.value.trim(),
+            qq_key: qqKeyInput.value.trim(),
+            times: timeList,
+            date_start,
+            date_end
+          })
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          throw new Error(data.error || "后端返回错误");
+        }
+        setTaskStatus("success", "任务创建成功，后端会在设定时间自动为你签到。");
+        currentTaskId = data.id || null;
+      } catch (e) {
+        console.error(e);
+        setTaskStatus("error", "任务提交失败：" + e.message);
+      }
+    }
+
+    async function loadTaskLogs() {
+      if (!currentToken) {
+        alert("请先完成扫码登录后再查看日志。");
+        return;
+      }
+      taskLogPanel.style.display = "block";
+      taskLogList.innerHTML = '<div class="hint-text">正在加载日志…</div>';
+      try {
+        const resp = await fetch(
+          apiBase + "/api/user/logs?token=" + encodeURIComponent(currentToken) + "&limit=20"
+        );
+        if (!resp.ok) {
+          throw new Error("HTTP " + resp.status);
+        }
+        const logs = await resp.json();
+        if (!Array.isArray(logs) || !logs.length) {
+          taskLogList.innerHTML = '<div class="hint-text">当前账号暂无任何执行日志。</div>';
+          return;
+        }
+        taskLogList.innerHTML = "";
+        logs.forEach((log) => {
+          const item = document.createElement("div");
+          item.className = "log-item";
+          const time = document.createElement("div");
+          time.className = "log-time";
+          time.textContent = log.run_at || "";
+          const taskInfo = document.createElement("div");
+          taskInfo.className = "log-task";
+          if (log.task) {
+            const parts = [];
+            if (log.task.name) parts.push(log.task.name);
+            if (log.task.class_id) parts.push("班级：" + log.task.class_id);
+            if (log.task.lat && log.task.lng) parts.push("坐标：" + log.task.lat + "," + log.task.lng);
+            taskInfo.textContent = parts.join(" · ");
+          }
+          const status = document.createElement("div");
+          status.className = "log-status";
+          status.textContent = log.status;
+          const msg = document.createElement("pre");
+          msg.className = "log-message";
+          msg.textContent = log.message || "";
+          item.appendChild(time);
+          if (taskInfo.textContent) {
+            item.appendChild(taskInfo);
+          }
+          item.appendChild(status);
+          item.appendChild(msg);
+          taskLogList.appendChild(item);
+        });
+      } catch (e) {
+        console.error(e);
+        taskLogList.innerHTML = '<div class="hint-text">加载日志失败：' + e.message + "</div>";
+      }
+    }
+
+    function hideTaskLogs() {
+      taskLogPanel.style.display = "none";
+    }
+
+    function locate() {
+      if (!navigator.geolocation) {
+        alert("当前浏览器不支持定位。");
+        return;
+      }
+      setTaskStatus("running", "正在尝试通过浏览器获取大致位置…");
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const { latitude, longitude } = pos.coords;
+          coordInput.value = latitude.toFixed(6) + " " + longitude.toFixed(6);
+          setTaskStatus("running", "已填入当前的经纬度（大致位置），如需可自行微调或直接提交。");
+        },
+        (err) => {
+          console.warn(err);
+          setTaskStatus("error", "定位失败，可以手动填写经纬度。");
+        },
+        { enableHighAccuracy: false, timeout: 8000, maximumAge: 600000 }
+      );
+    }
+
+    function openCoordPicker() {
+      window.open("https://www.lddgo.net/convert/position", "_blank");
+    }
+
+    // 初始化日期下拉框
+    initDateSelect("dateStart", dateStartYear, dateStartMonth, dateStartDay);
+    initDateSelect("dateEnd", dateEndYear, dateEndMonth, dateEndDay);
+
+    btnHealth.addEventListener("click", checkHealth);
+    btnCreateQr.addEventListener("click", createQr);
+    if (btnLocate) {
+      btnLocate.addEventListener("click", locate);
+    }
+    btnCoordPicker.addEventListener("click", openCoordPicker);
+    btnAddTime.addEventListener("click", addTime);
+    btnSubmitTask.addEventListener("click", submitTask);
+    btnViewLogs.addEventListener("click", loadTaskLogs);
+    btnHideLogs.addEventListener("click", hideTaskLogs);
+
+    window.addEventListener("load", () => {
+      // 仅在加载时检查后端健康状态，不再自动生成二维码，改为手动点击「生成二维码」
+      checkHealth();
+    });
+  </script>
+</body>
+</html>
+

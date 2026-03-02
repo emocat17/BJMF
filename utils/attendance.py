@@ -70,7 +70,7 @@ def Task(student):
         # 1. 预热请求：访问个人中心以触发 remember_me 自动登录并获取 session cookie
         warmup_url = "https://bjmf.k8n.cn/student/my"
         try:
-            session.get(warmup_url)
+            session.get(warmup_url, timeout=10)
             # print("会话预热完成")
         except Exception as e:
             print(f"会话预热失败: {e}")
@@ -80,7 +80,7 @@ def Task(student):
         # 更新Referer
         session.headers.update({'Referer': f'https://bjmf.k8n.cn/student/course/{ClassID}'})
 
-        response = session.get(url)
+        response = session.get(url, timeout=10)
 
         # 查找扫码签到项
         matches = []
@@ -149,7 +149,7 @@ def Task(student):
                 'gps_addr': ''
             }
 
-            response = session.post(url1, data=payload)
+            response = session.post(url1, data=payload, timeout=10)
             # x = BeautifulSoup(response.text, 'html.parser')
 
             if response.status_code == 200:

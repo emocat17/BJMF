@@ -1,0 +1,268 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no" />
+<link href="//c.d8n.cn/css.php?a=weui,bs46,laicon,m2019&v=1766543346" rel="stylesheet">
+    
+<script>var gconfig={role:'student',type:'fdy',cname:'院系',uname:'蔡永昊',uid:3244167 }; var COURSE_ID=110141;  var sitecdn='//c.d8n.cn';var sitecdn_bak='';</script>
+
+<script src="//c.d8n.cn/js.php?a=jquery,weui,app,bs46,main&v=1766543346"></script>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+    <style>
+        :root {
+            --punch-bg: #f6f8fb;
+            --punch-card: #ffffff;
+            --punch-primary: #2f7df6;
+            --punch-warn: #ff9f1a;
+            --punch-success: #21b26f;
+            --punch-danger: #ff4d4f;
+            --punch-muted: #8a94a6;
+        }
+        body {
+            background: var(--punch-bg);
+        }
+        .punch-demo {
+            padding: 12px 12px 24px;
+        }
+        .punch-hero {
+            background: linear-gradient(135deg, #1f6feb, #64b5f6);
+            color: #fff;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+        .punch-hero h1 {
+            font-size: 18px;
+            margin: 0 0 6px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+        .punch-hero p {
+            margin: 0;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .section-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 14px 0 8px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .section-subtitle {
+            color: var(--punch-muted);
+            font-size: 12px;
+        }
+        .punch-card {
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 6px 16px rgba(20, 30, 50, 0.06);
+        }
+        .punch-card .card-body {
+            padding: 12px;
+        }
+        .punch-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.18);
+        }
+        .punch-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+        .punch-meta span {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        .punch-action {
+            margin-top: 10px;
+        }
+        .punch-action .btn {
+            border-radius: 10px;
+            font-weight: 600;
+        }
+        .punch-card--primary {
+            background: var(--punch-primary);
+            color: #fff;
+        }
+        .punch-card--muted {
+            background: #263238;
+            color: #fff;
+        }
+        .punch-card--success {
+            background: var(--punch-success);
+            color: #fff;
+        }
+        .punch-card--warn {
+            background: var(--punch-warn);
+            color: #fff;
+        }
+        .history-list .list-group-item {
+            border: none;
+            border-radius: 12px;
+            margin-bottom: 10px;
+            box-shadow: 0 6px 16px rgba(20, 30, 50, 0.05);
+        }
+        .history-title {
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .history-tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .history-time {
+            font-size: 12px;
+            color: var(--punch-muted);
+            margin-top: 6px;
+        }
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+        .pill-success { background: rgba(33, 178, 111, 0.15); color: var(--punch-success); }
+        .pill-danger { background: rgba(255, 77, 79, 0.15); color: var(--punch-danger); }
+        .pill-muted { background: rgba(138, 148, 166, 0.15); color: var(--punch-muted); }
+        .pill-warn { background: rgba(255, 159, 26, 0.18); color: #d97706; }
+        .apply-btn {
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #fff;
+            background: var(--punch-warn);
+            text-decoration: none;
+        }
+        .punch-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .punch-tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px 0;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--punch-muted);
+            background: #fff;
+            text-decoration: none;
+            border: 1px solid #edf1f7;
+        }
+        .punch-tab.is-active {
+            color: #fff;
+            background: var(--punch-primary);
+            border-color: var(--punch-primary);
+        }
+        /* 签到成功信息 */
+        .punch-success-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+        .punch-success-info i {
+            font-size: 16px;
+        }
+        /* 通用信息标签 */
+        .punch-info-badge {
+            text-align: center;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        /* 查看更多按钮 */
+        .btn-view-more {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 24px;
+            background: #fff;
+            color: var(--punch-primary);
+            border: 1px solid var(--punch-primary);
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        .btn-view-more:hover {
+            background: var(--punch-primary);
+            color: #fff;
+        }
+        .btn-view-more i {
+            font-size: 16px;
+        }
+    </style>
+<title>班级魔方用户中心</title>
+</head><body class="color-theme-blue push-content-right theme-light " data-weui-theme="light">
+<div class="wrapper"><div class="sidebar sidebar-left" id="leftmenuarea"></div><div class="page vue-loading" style="position: absolute;overflow-y: auto"> 
+    <header class="row m-0 fixed-header">
+        <div class="left">
+            <a href="/student/course/110141"><i class="la la-arrow-left"
+                                                                       style="font-size: 1.5rem;line-height:44px;"></i></a>
+        </div>
+        <div class="col center">
+            <a href="javascript:void(0);" class="logo">点名考勤</a>
+        </div>
+    </header>
+
+
+    <div class="page-content" style="padding:60px 15px;">
+        <div class="punch-demo">
+            
+            <div class="punch-tabs">
+                <a class="punch-tab  is-active " href="?op=ing">正在进行的签到</a>
+                <a class="punch-tab " href="?op=ed">历史签到记录</a>
+            </div>
+
+                            
+                                <div class="section-title">
+                    <span>正在进行的签到</span>
+                    <span class="section-subtitle">0 条</span>
+                </div>
+
+                <div class="row">
+                                    </div>
+
+                                    <div style="text-align: center;color: #aaa;padding-top: 50px;">
+                        --- 还没有数据，等待老师发起签到 ---
+                    </div>
+                
+                
+                
+                
+                                    <div style="text-align: center;color: #aaa;padding-top: 50px;">
+                        <a href="/student/messages/center" target="_blank" style="color:#f55">
+                            Tips:可通过增强消息提醒能力来避免错过消息甚至漏签，点此查看
+                        </a>
+                    </div>
+                            
+                    </div>
+    </div>
+
+    
+    
+    <input type="file" accept="image/*" capture='camera' style="display: none" />
+ </div></div>
+
+</body></html>
