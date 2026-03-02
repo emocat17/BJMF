@@ -24,6 +24,7 @@ logs/
 *.tmp
 
 ## 数据库 / 缓存文件
+/web_signin/db/web_signin.db
 *.sqlite
 *.sqlite3
 *.db

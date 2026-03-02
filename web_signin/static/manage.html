@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>签到任务后台管理</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --card-bg: #020617;
+      --accent: #38bdf8;
+      --border-subtle: #1e293b;
+      --text-main: #e5e7eb;
+      --text-soft: #9ca3af;
+      --danger: #f97373;
+      --success: #22c55e;
+      --radius-lg: 14px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 45%, #000 100%);
+      color: var(--text-main);
+      padding: 16px;
+    }
+    .shell {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .title-pill {
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, rgba(56,189,248,0.2), rgba(59,130,246,0.15));
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--accent);
+    }
+    .subtitle {
+      font-size: 13px;
+      color: var(--text-soft);
+    }
+    .card {
+      background: radial-gradient(circle at top left, rgba(56,189,248,0.18), transparent 55%),
+                  radial-gradient(circle at bottom, rgba(15,23,42,0.9), #020617 65%);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      padding: 14px 14px 12px;
+      box-shadow:
+        0 24px 60px rgba(15,23,42,0.9),
+        0 0 0 1px rgba(15,23,42,0.9) inset;
+      margin-bottom: 12px;
+    }
+    .row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-bottom: 6px;
+    }
+    .input, select {
+      border-radius: 999px;
+      border: 1px solid rgba(51, 65, 85, 0.85);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-main);
+      font-size: 12px;
+      padding: 6px 10px;
+      outline: none;
+      min-width: 0;
+    }
+    .input:focus, select:focus {
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow:
+        0 0 0 1px rgba(15,23,42,0.95) inset,
+        0 0 0 1px rgba(56,189,248,0.75),
+        0 16px 30px rgba(15,23,42,0.95);
+    }
+    .btn {
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.8);
+      background: rgba(15,23,42,0.98);
+      color: #e5e7eb;
+      font-size: 12px;
+      padding: 6px 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 500;
+    }
+    .btn-primary {
+      border-color: transparent;
+      background: linear-gradient(135deg, #38bdf8, #4f46e5);
+      color: #0b1120;
+    }
+    .btn-danger {
+      border-color: rgba(248,113,113,0.8);
+      background: rgba(127,29,29,0.95);
+      color: #fee2e2;
+    }
+    .btn-ghost {
+      border-style: dashed;
+      border-color: rgba(148,163,184,0.65);
+      background: rgba(15,23,42,0.9);
+      color: var(--text-soft);
+    }
+    .status-text {
+      font-size: 12px;
+      color: var(--text-soft);
+    }
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      margin-right: 6px;
+      background: #6b7280;
+    }
+    .status-dot.ok {
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.4);
+    }
+    .status-dot.bad {
+      background: #f97373;
+      box-shadow: 0 0 0 4px rgba(248,113,113,0.4);
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 12px;
+    }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: minmax(0, 1fr); }
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+    th, td {
+      padding: 6px 8px;
+      border-bottom: 1px solid rgba(30,41,59,0.9);
+      text-align: left;
+    }
+    th {
+      font-weight: 500;
+      color: #cbd5f5;
+      background: rgba(15,23,42,0.9);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tbody tr:hover {
+      background: rgba(15,23,42,0.75);
+    }
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      font-size: 11px;
+    }
+    .tag-on {
+      border-color: rgba(34,197,94,0.8);
+      color: #bbf7d0;
+    }
+    .tag-off {
+      border-color: rgba(148,163,184,0.9);
+      color: #e5e7eb;
+    }
+    .scroll {
+      max-height: 420px;
+      overflow: auto;
+    }
+    .field-col {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+    .label {
+      color: var(--text-soft);
+      font-size: 12px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      border-radius: 10px;
+      border: 1px solid rgba(51, 65, 85, 0.85);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-main);
+      font-size: 12px;
+      padding: 6px 8px;
+      resize: vertical;
+    }
+    .log-item {
+      border-bottom: 1px dashed rgba(30,41,59,0.9);
+      padding: 6px 0;
+      font-size: 12px;
+    }
+    .log-time {
+      color: var(--text-soft);
+      margin-bottom: 2px;
+    }
+    .log-task {
+      color: #e5e7eb;
+      margin-bottom: 2px;
+    }
+    .log-status {
+      font-size: 11px;
+      color: var(--success);
+      margin-bottom: 2px;
+    }
+    .log-status.error { color: var(--danger); }
+    .log-message {
+      white-space: pre-wrap;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      color: #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <div class="header">
+      <div>
+        <div class="title">
+          <span class="title-pill">Admin</span>
+          <span>签到任务后台管理</span>
+        </div>
+        <div class="subtitle">用于查看、筛选、启用/禁用和删除签到任务，并浏览执行日志。</div>
+      </div>
+      <div class="status-text">
+        <span id="healthDot" class="status-dot"></span>
+        <span id="healthText">后端状态：未知</span>
+      </div>
+    </div>
+
+
+
+    <div class="layout">
+      <div class="card">
+        <div class="row" style="margin-bottom:8px;">
+          <input id="filterName" class="input" placeholder="按姓名模糊搜索" />
+          <input id="filterClass" class="input" placeholder="按班级模糊搜索" />
+          <select id="filterEnabled">
+            <option value="">全部状态</option>
+            <option value="1">仅启用</option>
+            <option value="0">仅禁用</option>
+          </select>
+          <button id="btnReloadTasks" class="btn btn-ghost">刷新列表</button>
+        </div>
+        <div class="scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>姓名 / 班级</th>
+                <th>坐标</th>
+                <th>时间点</th>
+                <th>启用</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="taskTableBody">
+              <tr><td colspan="6">正在加载任务列表...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="field-col">
+          <div class="label">当前选中任务：<span id="currentTaskLabel">无</span></div>
+        </div>
+        <div class="field-col">
+          <div class="label">坐标（lat lng）</div>
+          <input id="editCoord" class="input" placeholder="例如：26.056756 119.196135" />
+        </div>
+        <div class="field-col">
+          <div class="label">微信通知 Key / QQ 通知 Key</div>
+          <div class="row">
+            <input id="editWxKey" class="input" placeholder="WXKey" />
+            <input id="editQqKey" class="input" placeholder="QmsgKEY" />
+          </div>
+        </div>
+        <div class="field-col">
+          <div class="label">执行时间点（用英文逗号分隔，例如 07:30:00,12:00:00）</div>
+          <input id="editTimes" class="input" placeholder="07:30:00,12:00:00" />
+        </div>
+        <div class="field-col">
+          <div class="label">任务状态</div>
+          <select id="editEnabled" class="input">
+            <option value="1">启用</option>
+            <option value="0">禁用</option>
+          </select>
+        </div>
+        <div class="row" style="justify-content:flex-end;margin-top:4px;">
+          <button id="btnSaveTask" class="btn btn-primary">保存修改</button>
+          <button id="btnDeleteTask" class="btn btn-danger">删除任务</button>
+        </div>
+        <hr style="border:none;border-top:1px solid rgba(30,41,59,0.9);margin:10px 0;">
+        <div class="field-col">
+          <div class="label">最近执行日志（最多 50 条）</div>
+          <div id="logList" class="scroll" style="max-height:220px;">
+            <div class="status-text">请选择左侧任务后，再点击「刷新日志」。</div>
+          </div>
+        </div>
+        <div class="row" style="justify-content:flex-end;">
+          <button id="btnReloadLogs" class="btn btn-ghost">刷新日志</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const apiBase = "";
+
+    const healthDot = document.getElementById("healthDot");
+    const healthText = document.getElementById("healthText");
+
+    const filterName = document.getElementById("filterName");
+    const filterClass = document.getElementById("filterClass");
+    const filterEnabled = document.getElementById("filterEnabled");
+    const btnReloadTasks = document.getElementById("btnReloadTasks");
+    const taskTableBody = document.getElementById("taskTableBody");
+
+    const currentTaskLabel = document.getElementById("currentTaskLabel");
+    const editCoord = document.getElementById("editCoord");
+    const editWxKey = document.getElementById("editWxKey");
+    const editQqKey = document.getElementById("editQqKey");
+    const editTimes = document.getElementById("editTimes");
+    const editEnabled = document.getElementById("editEnabled");
+    const btnSaveTask = document.getElementById("btnSaveTask");
+    const btnDeleteTask = document.getElementById("btnDeleteTask");
+
+    const logList = document.getElementById("logList");
+    const btnReloadLogs = document.getElementById("btnReloadLogs");
+
+    let currentTaskId = null;
+    let tasksCache = [];
+
+    function setHealth(ok) {
+      healthDot.className = "status-dot" + (ok ? " ok" : " bad");
+      healthText.textContent = ok ? "后端状态：在线" : "后端状态：不可用";
+    }
+
+    async function checkHealth() {
+      try {
+        const resp = await fetch(apiBase + "/health");
+        const data = await resp.json();
+        setHealth(data.status === "ok");
+      } catch (e) {
+        setHealth(false);
+      }
+    }
+
+    function renderTasks() {
+      taskTableBody.innerHTML = "";
+      if (!tasksCache.length) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 6;
+        td.textContent = "暂无任务。";
+        tr.appendChild(td);
+        taskTableBody.appendChild(tr);
+        return;
+      }
+      tasksCache.forEach(task => {
+        const tr = document.createElement("tr");
+        tr.dataset.id = task.id;
+        const tdId = document.createElement("td");
+        tdId.textContent = String(task.id);
+        const tdUser = document.createElement("td");
+        tdUser.textContent = task.name + (task.class_id ? " / " + task.class_id : "");
+        const tdCoord = document.createElement("td");
+        tdCoord.textContent = (task.lat || "") + (task.lng ? " " + task.lng : "");
+        const tdTimes = document.createElement("td");
+        tdTimes.textContent = Array.isArray(task.times) ? task.times.join(",") : "";
+        const tdEnabled = document.createElement("td");
+        const span = document.createElement("span");
+        span.className = "tag " + (task.enabled ? "tag-on" : "tag-off");
+        span.textContent = task.enabled ? "启用" : "禁用";
+        tdEnabled.appendChild(span);
+        const tdOps = document.createElement("td");
+        const btnSelect = document.createElement("button");
+        btnSelect.className = "btn btn-ghost";
+        btnSelect.textContent = "选择";
+        btnSelect.style.fontSize = "11px";
+        btnSelect.addEventListener("click", () => selectTask(task.id));
+        tdOps.appendChild(btnSelect);
+
+        tr.appendChild(tdId);
+        tr.appendChild(tdUser);
+        tr.appendChild(tdCoord);
+        tr.appendChild(tdTimes);
+        tr.appendChild(tdEnabled);
+        tr.appendChild(tdOps);
+        taskTableBody.appendChild(tr);
+      });
+    }
+
+    async function loadTasks() {
+      const params = new URLSearchParams();
+      if (filterName.value.trim()) params.set("name", filterName.value.trim());
+      if (filterClass.value.trim()) params.set("class_id", filterClass.value.trim());
+      if (filterEnabled.value) params.set("enabled", filterEnabled.value);
+      try {
+        const resp = await fetch(apiBase + "/api/admin/tasks?" + params.toString());
+        const data = await resp.json();
+        if (!resp.ok) {
+          taskTableBody.innerHTML = "<tr><td colspan='6'>加载失败：" + (data.error || "未知错误") + "</td></tr>";
+          return;
+        }
+        tasksCache = Array.isArray(data) ? data : [];
+        renderTasks();
+      } catch (e) {
+        taskTableBody.innerHTML = "<tr><td colspan='6'>请求失败：" + e.message + "</td></tr>";
+      }
+    }
+
+    function selectTask(id) {
+      currentTaskId = id;
+      const t = tasksCache.find(x => x.id === id);
+      if (!t) {
+        currentTaskLabel.textContent = "无";
+        return;
+      }
+      currentTaskLabel.textContent = `#${t.id} ${t.name} (${t.class_id || "无班级信息"})`;
+      editCoord.value = (t.lat || "") + (t.lng ? " " + t.lng : "");
+      editWxKey.value = t.wx_key || "";
+      editQqKey.value = t.qq_key || "";
+      editTimes.value = (Array.isArray(t.times) ? t.times.join(",") : "");
+      editEnabled.value = t.enabled ? "1" : "0";
+      loadLogsForCurrent();
+    }
+
+    async function saveTask() {
+      if (!currentTaskId) {
+        alert("请先在左侧选择一个任务。");
+        return;
+      }
+      const coord = editCoord.value.trim();
+      let lat = null, lng = null;
+      if (coord) {
+        const parts = coord.replace(/[，|、]+/g, " ").split(/\s+/).filter(Boolean);
+        if (parts.length >= 2) {
+          lat = parts[0];
+          lng = parts[1];
+        }
+      }
+      const timesStr = editTimes.value.trim();
+      let times = [];
+      if (timesStr) {
+        times = timesStr.split(",").map(s => s.trim()).filter(Boolean);
+      }
+      const payload = {
+        lat,
+        lng,
+        wx_key: editWxKey.value.trim(),
+        qq_key: editQqKey.value.trim(),
+        times,
+        enabled: editEnabled.value === "1"
+      };
+      try {
+        const resp = await fetch(apiBase + "/api/admin/tasks/" + currentTaskId, {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          alert("保存失败：" + (data.error || "未知错误"));
+          return;
+        }
+        alert("保存成功。");
+        loadTasks();
+      } catch (e) {
+        alert("请求失败：" + e.message);
+      }
+    }
+
+    async function deleteTask() {
+      if (!currentTaskId) {
+        alert("请先选择要删除的任务。");
+        return;
+      }
+      if (!confirm("确定要删除该任务及其所有日志吗？此操作不可恢复。")) {
+        return;
+      }
+      try {
+        const resp = await fetch(apiBase + "/api/admin/tasks/" + currentTaskId, {
+          method: "DELETE",
+          headers: {}
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          alert("删除失败：" + (data.error || "未知错误"));
+          return;
+        }
+        alert("删除成功。");
+        currentTaskId = null;
+        currentTaskLabel.textContent = "无";
+        editCoord.value = "";
+        editWxKey.value = "";
+        editQqKey.value = "";
+        editTimes.value = "";
+        logList.innerHTML = '<div class="status-text">任务已删除。</div>';
+        loadTasks();
+      } catch (e) {
+        alert("请求失败：" + e.message);
+      }
+    }
+
+    async function loadLogsForCurrent() {
+      if (!currentTaskId) {
+        logList.innerHTML = '<div class="status-text">请选择任务。</div>';
+        return;
+      }
+      try {
+        const params = new URLSearchParams({ task_id: String(currentTaskId), limit: "50" });
+        const resp = await fetch(apiBase + "/api/admin/logs?" + params.toString(), {
+          headers: {}
+        });
+        const data = await resp.json();
+        if (!resp.ok) {
+          logList.innerHTML = '<div class="status-text">加载失败：' + (data.error || "未知错误") + "</div>";
+          return;
+        }
+        const logs = Array.isArray(data) ? data : [];
+        if (!logs.length) {
+          logList.innerHTML = '<div class="status-text">暂无日志。</div>';
+          return;
+        }
+        logList.innerHTML = "";
+        logs.forEach(log => {
+          const div = document.createElement("div");
+          div.className = "log-item";
+          const t = document.createElement("div");
+          t.className = "log-time";
+          t.textContent = log.run_at || "";
+          const taskInfo = document.createElement("div");
+          taskInfo.className = "log-task";
+          if (log.task) {
+            const parts = [];
+            if (log.task.name) parts.push(log.task.name);
+            if (log.task.class_id) parts.push("班级：" + log.task.class_id);
+            taskInfo.textContent = parts.join(" · ");
+          }
+          const s = document.createElement("div");
+          s.className = "log-status";
+          if (log.status === "error") s.classList.add("error");
+          s.textContent = "状态：" + (log.status || "未知");
+          const msg = document.createElement("pre");
+          msg.className = "log-message";
+          msg.textContent = log.message || "";
+          div.appendChild(t);
+          if (taskInfo.textContent) div.appendChild(taskInfo);
+          div.appendChild(s);
+          div.appendChild(msg);
+          logList.appendChild(div);
+        });
+      } catch (e) {
+        logList.innerHTML = '<div class="status-text">请求失败：' + e.message + "</div>";
+      }
+    }
+
+    btnReloadTasks.addEventListener("click", loadTasks);
+    btnSaveTask.addEventListener("click", saveTask);
+    btnDeleteTask.addEventListener("click", deleteTask);
+    btnReloadLogs.addEventListener("click", loadLogsForCurrent);
+
+    window.addEventListener("load", () => {
+      checkHealth();
+      loadTasks();
+    });
+  </script>
+</body>
+</html>
+

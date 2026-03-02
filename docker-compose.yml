@@ -1,0 +1,22 @@
+version: "3.9"
+
+services:
+  web_signin:
+    build:
+      context: .
+      dockerfile: web_signin/Dockerfile
+    container_name: bjmf-web-signin
+    restart: unless-stopped
+    ports:
+      # 左边是宿主机端口，右边是容器内部端口（默认改为 9988，可通过环境变量 WEB_SIGNIN_PORT 覆盖）
+      - "${WEB_SIGNIN_PORT:-9988}:${WEB_SIGNIN_PORT:-9988}"
+    environment:
+      # 默认为 9988，如需修改可在运行 docker compose 前设置环境变量 WEB_SIGNIN_PORT
+      - WEB_SIGNIN_PORT=${WEB_SIGNIN_PORT:-9988}
+      # 根据需要在此加入更多环境变量，如管理员密码：
+      # - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+    volumes:
+      # 持久化 SQLite 数据库
+      - ./web_signin/db:/app/web_signin/db
+    # 如需在构建前端静态资源，可以改成多阶段构建，这里保持简单直接运行
+

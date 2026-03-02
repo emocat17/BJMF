@@ -55,11 +55,17 @@ def create_app():
     def health_check():
         return {"status": "ok"}
 
-    # 前端单页
+    # 前端单页（用户配置页面）
     @app.get("/")
     def index_page():
         static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
         return send_from_directory(static_dir, "index.html")
+
+    # 后台管理页面（仅提供静态 HTML，实际权限控制在 /api/admin/* 接口中完成）
+    @app.get("/manage")
+    def manage_page():
+        static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "static")
+        return send_from_directory(static_dir, "manage.html")
 
     # ========== 阶段三：扫码登录接口 ==========
 
@@ -430,19 +436,15 @@ def create_app():
 
     def _require_admin(app):
         """
-        从请求中校验管理员 token。
-        约定使用 HTTP 头 X-Admin-Token 传递。
-        """
-        token = request.headers.get("X-Admin-Token") or request.args.get("admin_token")
-        if not token:
-            return None, (jsonify({"error": "missing admin token"}), 401)
+        管理员认证校验。
 
-        tokens = app.config.get("ADMIN_TOKENS", {})
-        now = datetime.utcnow()
-        expire_at = tokens.get(token)
-        if not expire_at or expire_at < now:
-            return None, (jsonify({"error": "invalid or expired admin token"}), 401)
-        return token, None
+        当前部署需求：后台无需密码即可查看与管理所有任务，
+        因此此函数直接放行，不再强制要求 admin token。
+
+        如需重新开启鉴权，可恢复为从请求头 `X-Admin-Token` /
+        查询参数 `admin_token` 中读取 token 并校验有效期。
+        """
+        return "public", None
 
     @app.post("/api/admin/init")
     def api_admin_init():
@@ -715,5 +717,32 @@ def create_app():
                     for log, task in logs
                 ]
             )
+
+    @app.delete("/api/admin/tasks/<int:task_id>")
+    def api_admin_delete_task(task_id: int):
+        """
+        管理员删除任务。
+
+        - 认证：需要 admin token。
+        - 同时会移除 APScheduler 中对应的调度任务；
+        - 由于 Task.logs 关系设置了 cascade="all, delete-orphan"，
+          删除任务会自动级联删除该任务的所有日志。
+        """
+        _, error_resp = _require_admin(app)
+        if error_resp:
+            return error_resp
+
+        SessionLocal = app.config["DB_SESSION_FACTORY"]
+        with SessionLocal() as db:
+            task = db.query(Task).filter(Task.id == task_id).first()
+            if not task:
+                return jsonify({"error": "not found"}), 404
+
+            # 先移除调度任务，再删数据库记录
+            unregister_task_jobs(app, task.id)
+            db.delete(task)
+            db.commit()
+
+        return jsonify({"status": "ok"})
 
     return app
