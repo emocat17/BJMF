@@ -146,6 +146,51 @@ pip install -r requirements.txt
    - **Linux**: 使用 `crontab` 设置定时任务。
    - **云函数**: 可部署至云函数平台。
 
+## 文件与隐私说明
+
+- `data.json`、`.env` 等文件中包含个人 Cookie、经纬度、推送 Key 等敏感信息，**不会被提交到 Git 仓库**（已在 `.gitignore` 中忽略），请妥善保管本地副本并做好备份。
+- `web_signin/` 目录下的本地数据库文件 `web_signin/db/web_signin.db` 也已默认加入 `.gitignore`，仅用于本地运行和调试，不会上传到远程仓库。
+- 如需分享或上传日志/截图，请注意**手动打码或删除其中的 Cookie、班级 ID、经纬度等个人隐私信息**。
+
+## web_signin Web 管理端
+
+`web_signin/` 提供了一个基于 Flask + 前端页面的**Web 管理界面**，用于在浏览器中管理用户、查看签到任务等。
+
+### 本地直接运行
+
+1. 安装 Web 版依赖（在项目根目录执行）：
+   ```bash
+   pip install -r web_signin/requirements.txt
+   ```
+2. （可选）在 `web_signin/` 目录下复制一份配置模板：
+   ```bash
+   cd web_signin
+   copy config.json.example config.json  # Windows
+   # 或
+   cp config.json.example config.json    # Linux / macOS
+   ```
+   如需自定义 Web 端口，可在 `config.json` 中填写 `"port": 9988` 等数值，或通过环境变量 `WEB_SIGNIN_PORT` 覆盖。
+3. 启动 Web 服务：
+   ```bash
+   python web_signin/run.py
+   ```
+4. 在浏览器访问：
+   ```text
+   http://127.0.0.1:9988
+   ```
+   若修改了端口，请将 `9988` 替换为实际端口。
+
+### 使用 Docker 运行
+
+项目内已提供 `web_signin/Dockerfile`，可用于快速构建和运行 Web 版：
+
+```bash
+docker build -t bjmf-web -f web_signin/Dockerfile .
+docker run -d --name bjmf-web -p 9988:9988 bjmf-web
+```
+
+如需调整端口，可修改映射 `-p 宿主端口:容器端口`，或通过环境变量 `WEB_SIGNIN_PORT` 覆盖容器内部端口。
+
 ## 注意事项
 
 - 程序会自动检测并填充空的 class 字段。
