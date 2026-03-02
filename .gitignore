@@ -2,3 +2,45 @@
 __pycache__/
 *.pyc
 /.env
+
+## 本项目敏感/本地数据
+/data/
+.env.*
+*.env
+
+## Python 缓存
+*.py[cod]
+*$py.class
+
+## 虚拟环境
+.venv/
+venv/
+env/
+
+## 日志与运行时输出
+logs/
+*.log
+*.out
+*.tmp
+
+## 数据库 / 缓存文件
+*.sqlite
+*.sqlite3
+*.db
+*.db3
+*.bak
+
+## 编辑器与 IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+## 操作系统生成文件
+.DS_Store
+Thumbs.db
+/web_signin/db/web_signin.db
+
+## Node / 前端依赖（如果后续引入）
+node_modules/
+web_signin/db/web_signin.db
