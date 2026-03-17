@@ -92,7 +92,8 @@ def Task(student):
         
         # 策略2: 查找链接格式 /student/punchs/course/{ClassID}/{ID}
         # 注意：这里使用 \d+ 匹配 ClassID，以适应可能的变化
-        pattern_link = re.compile(r'/student/punchs/course/\d+/(\d+)')
+        # 支持多种签到类型: punchs (standard), punchw (weekly), puncha (assignment) 等
+        pattern_link = re.compile(r'/student/punch\w+/course/\d+/(\d+)')
         matches_link = pattern_link.findall(response.text)
         matches.extend(matches_link)
         
@@ -139,7 +140,17 @@ def Task(student):
         # 处理每个签到项
         for match in matches:
             print(f"签到项: {match}")
-            url1 = f"https://bjmf.k8n.cn/student/punchs/course/{ClassID}/{match}"
+            
+            # 从HTML中提取实际的链接类型 (punchs, punchw, puncha 等)
+            punch_type = 'punchs'  # 默认类型
+            # 查找包含该签到ID的链接，获取实际的punch类型
+            punch_pattern = re.compile(r'/student/(punch\w+)/course/\d+/' + str(match))
+            punch_match = punch_pattern.search(response.text)
+            if punch_match:
+                punch_type = punch_match.group(1)
+                print(f"检测到签到类型: {punch_type}")
+            
+            url1 = f"https://bjmf.k8n.cn/student/{punch_type}/course/{ClassID}/{match}"
             payload = {
                 'id': match,
                 'lat': lat,
