@@ -63,54 +63,59 @@ def Task(student):
         
         # 添加Cookie
         # 优先使用完整cookie字符串，如果格式不标准则尝试提取
-        # requests session headers 需要字典或字符串，直接设置 header 即可
         headers['Cookie'] = student['cookie']
         session.headers.update(headers)
         
-        # 1. 预热请求：访问个人中心以触发 remember_me 自动登录并获取 session cookie
+        # 1. 访问个人中心以触发 remember_me 自动登录并获取 session cookie
         warmup_url = "https://bjmf.k8n.cn/student/my"
         try:
             session.get(warmup_url, timeout=10)
-            # print("会话预热完成")
         except Exception as e:
             print(f"会话预热失败: {e}")
 
-        # 2. 请求签到列表
-        url = f'https://bjmf.k8n.cn/student/course/{ClassID}/punchs'
-        # 更新Referer
-        session.headers.update({'Referer': f'https://bjmf.k8n.cn/student/course/{ClassID}'})
+        # 2. 探测所有签到/打卡模块的列表页，合并所有签到项
+        module_list = ['punchs', 'daka']
+        all_matches = []
+        all_punch_types = {}  # {id: punch_type}，记录每个签到项所属的模块类型
 
-        response = session.get(url, timeout=10)
+        for module in module_list:
+            list_url = f'https://bjmf.k8n.cn/student/course/{ClassID}/{module}'
+            session.headers.update({'Referer': f'https://bjmf.k8n.cn/student/course/{ClassID}'})
 
-        # 查找扫码签到项
-        matches = []
-        
-        # 策略1: 查找 punchcard_ID 格式
-        pattern_id = re.compile(r'punchcard_(\d+)')
-        matches_id = pattern_id.findall(response.text)
-        matches.extend(matches_id)
-        
-        # 策略2: 查找链接格式 /student/punchs/course/{ClassID}/{ID}
-        # 注意：这里使用 \d+ 匹配 ClassID，以适应可能的变化
-        # 支持多种签到类型: punchs (standard), punchw (weekly), puncha (assignment) 等
-        pattern_link = re.compile(r'/student/punch\w+/course/\d+/(\d+)')
-        matches_link = pattern_link.findall(response.text)
-        matches.extend(matches_link)
-        
-        # 策略3: 检查是否直接跳转到了签到页面 (根据URL判断)
-        # URL格式通常为: .../student/punchs/course/{ClassID}/{ID}
-        current_url = response.url
-        # print(f"Debug: Current URL: {current_url}")
-        
-        url_match = re.search(r'/student/punchs/course/\d+/(\d+)', current_url)
-        if url_match:
-            print(f"检测到直接跳转至签到页面，ID: {url_match.group(1)}")
-            matches.append(url_match.group(1))
-        
+            try:
+                response = session.get(list_url, timeout=10)
+            except Exception as e:
+                print(f"获取 {module} 列表页失败: {e}")
+                continue
+
+            # 策略1: 查找 punchcard_ID 格式（DOM属性，模块无关）
+            pattern_id = re.compile(r'punchcard_(\d+)')
+            for mid in pattern_id.findall(response.text):
+                if mid not in all_punch_types:
+                    all_matches.append(mid)
+                    all_punch_types[mid] = module
+
+            # 策略2: 查找链接格式，支持 punchs/punchw/puncha 等以及 daka
+            pattern_link = re.compile(r'/student/(punch\w+|daka)/course/\d+/(\d+)')
+            for ptype, mid in pattern_link.findall(response.text):
+                if mid not in all_punch_types:
+                    all_matches.append(mid)
+                    all_punch_types[mid] = ptype
+
+            # 策略3: 检查是否直接跳转到了签到/打卡页面
+            current_url = response.url
+            url_match = re.search(r'/student/(punch\w+|daka)/course/\d+/(\d+)', current_url)
+            if url_match:
+                ptype, mid = url_match.group(1), url_match.group(2)
+                print(f"检测到直接跳转至 {ptype} 页面，ID: {mid}")
+                if mid not in all_punch_types:
+                    all_matches.append(mid)
+                    all_punch_types[mid] = ptype
+
         # 去重
-        matches = list(set(matches))
+        all_matches = list(set(all_matches))
 
-        if not matches:
+        if not all_matches:
             # 尝试检测是否已经签到
             soup_check = BeautifulSoup(response.text, 'html.parser')
             
@@ -137,19 +142,12 @@ def Task(student):
             # print(f"Debug: Response Text Preview: {response.text[:200]}") # Uncomment for more details
             return name, 'no_sign_in'
 
-        # 处理每个签到项
-        for match in matches:
-            print(f"签到项: {match}")
-            
-            # 从HTML中提取实际的链接类型 (punchs, punchw, puncha 等)
-            punch_type = 'punchs'  # 默认类型
-            # 查找包含该签到ID的链接，获取实际的punch类型
-            punch_pattern = re.compile(r'/student/(punch\w+)/course/\d+/' + str(match))
-            punch_match = punch_pattern.search(response.text)
-            if punch_match:
-                punch_type = punch_match.group(1)
-                print(f"检测到签到类型: {punch_type}")
-            
+        # 处理每个签到/打卡项
+        for match in all_matches:
+            print(f"签到项: {match} (模块: {all_punch_types.get(match, 'punchs')})")
+
+            punch_type = all_punch_types.get(match, 'punchs')
+
             url1 = f"https://bjmf.k8n.cn/student/{punch_type}/course/{ClassID}/{match}"
             payload = {
                 'id': match,
