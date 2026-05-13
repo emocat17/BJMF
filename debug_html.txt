@@ -1,0 +1,38 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
+<meta name="format-detection" content="telephone=no" />
+<link href="//c.d8n.cn/css.php?a=weui,bs46,laicon,m2019&v=20260512" rel="stylesheet">
+<script>var gconfig={role:'student',type:'fdy',cname:'院系',uname:'蔡永昊',uid:3244167 }; var COURSE_ID=110141;  var sitecdn='//c.d8n.cn';var sitecdn_bak='';</script>
+
+<script src="//c.d8n.cn/js.php?a=jquery,weui,app,bs46,main&v=1778582185"></script>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<title>班级魔方用户中心</title>
+</head><body class="color-theme-blue push-content-right theme-light " data-weui-theme="light">
+<div class="wrapper"><div class="sidebar sidebar-left" id="leftmenuarea"></div><div class="page vue-loading" style="position: absolute;overflow-y: auto">     <style type="text/css">
+        .page {
+            background: #fff
+        }
+    </style>
+    <header class="row m-0 fixed-header">
+        <div class="left">
+            <a href="javascript:void(0);" onclick="history.go(-1);"><i class="la la-arrow-left"
+                                                                       style="font-size: 1.5rem;line-height:44px;"></i></a>
+        </div>
+        <div class="col center">
+            <a href="javascript:void(0);" class="logo">打卡活动项目</a>
+        </div>
+            </header>
+
+    <div class="page-content">
+        <div style="padding:15px;">
+                        <div class="list-group">
+                                    <div class="text-center" style="color:#cdcdcd;font-size:1.5rem">
+                        <img src="//c.d8n.cn/res/404.png"><br>
+                        老师还没有创建或关联过打卡活动
+                    </div>
+                            </div>
+        </div>
+    </div>
+
+ </div></div>
+
+</body></html>
